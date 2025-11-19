@@ -92,7 +92,7 @@ def run_complete_setup(stock_symbol):
     
     try:
         result = subprocess.run(
-            ['python3', os.path.join(SCRIPT_DIR, 'analyze_indian_stocks.py'), stock_symbol],
+            ['python3', os.path.join(SCRIPT_DIR, '01_analyze_indian_stocks.py'), stock_symbol],
             check=True,
             capture_output=False,
             cwd=PROJECT_ROOT
@@ -164,7 +164,7 @@ def run_complete_setup(stock_symbol):
     print("="*80)
     try:
         subprocess.run(
-            ['python3', os.path.join(SCRIPT_DIR, 'analyze_correlations.py'), analysis_file],
+            ['python3', os.path.join(SCRIPT_DIR, '03_analyze_correlations.py'), analysis_file],
             check=True,
             capture_output=True,
             cwd=PROJECT_ROOT
@@ -180,7 +180,7 @@ def run_complete_setup(stock_symbol):
     print("🔍 Identifying market regimes (this may take a few minutes)...")
     try:
         subprocess.run(
-            ['python3', os.path.join(SCRIPT_DIR, 'behavioral_patterns.py'), analysis_file],
+            ['python3', os.path.join(SCRIPT_DIR, '04_behavioral_patterns.py'), analysis_file],
             check=True,
             capture_output=True,
             cwd=PROJECT_ROOT
@@ -202,7 +202,7 @@ def run_complete_setup(stock_symbol):
     if os.path.exists(regime_file):
         try:
             subprocess.run(
-                ['python3', os.path.join(SCRIPT_DIR, 'identify_red_light_regime.py'), regime_file],
+                ['python3', os.path.join(SCRIPT_DIR, '05_identify_red_light_regime.py'), regime_file],
                 check=True,
                 capture_output=False,
                 cwd=PROJECT_ROOT
@@ -223,7 +223,7 @@ def run_complete_setup(stock_symbol):
             latest_date = df.index.max().strftime('%Y-%m-%d')
             print(f"📅 Analyzing similarity for latest date: {latest_date}")
             subprocess.run(
-                ['python3', os.path.join(SCRIPT_DIR, 'find_similar_days.py'), latest_date, analysis_file],
+                ['python3', os.path.join(SCRIPT_DIR, '06_find_similar_days.py'), latest_date, analysis_file],
                 check=True,
                 capture_output=True,
                 cwd=PROJECT_ROOT
@@ -254,7 +254,7 @@ def run_complete_setup(stock_symbol):
                 print(f"\n💡 Running Simple Backtest instead (70/30 split)...")
                 try:
                     subprocess.run(
-                        ['python3', os.path.join(SCRIPT_DIR, 'simple_backtest_for_new_stocks.py'), analysis_file],
+                        ['python3', os.path.join(SCRIPT_DIR, '07a_simple_backtest_for_new_stocks.py'), analysis_file],
                         check=True,
                         capture_output=False,
                         cwd=PROJECT_ROOT
@@ -267,7 +267,7 @@ def run_complete_setup(stock_symbol):
             else:
                 print("📊 Running walk-forward analysis with Monte Carlo Permutation Test...")
                 result = subprocess.run(
-                    ['python3', os.path.join(SCRIPT_DIR, 'donchian_mcpt_backtest.py'), analysis_file],
+                    ['python3', os.path.join(SCRIPT_DIR, '07b_donchian_mcpt_backtest.py'), analysis_file],
                     check=True,
                     capture_output=False,
                     cwd=PROJECT_ROOT
@@ -304,7 +304,7 @@ def run_complete_setup(stock_symbol):
                 print("   - Pattern-based early exits (-2.0% threshold, 10 similar days)")
                 print("   - Walk-forward MCPT")
                 result = subprocess.run(
-                    ['python3', os.path.join(SCRIPT_DIR, 'donchian_enhanced_backtest.py'), analysis_file],
+                    ['python3', os.path.join(SCRIPT_DIR, '08_donchian_enhanced_backtest.py'), analysis_file],
                     check=True,
                     capture_output=False,
                     cwd=PROJECT_ROOT
@@ -326,7 +326,7 @@ def run_complete_setup(stock_symbol):
     if os.path.exists(walkforward_file) and os.path.exists(regime_file):
         try:
             subprocess.run(
-                ['python3', os.path.join(SCRIPT_DIR, 'analyze_drawdowns.py'), walkforward_file, regime_file],
+                ['python3', os.path.join(SCRIPT_DIR, '09_analyze_drawdowns.py'), walkforward_file, regime_file],
                 check=True,
                 capture_output=False,
                 cwd=PROJECT_ROOT
@@ -342,7 +342,7 @@ def run_complete_setup(stock_symbol):
     print("="*80)
     try:
         subprocess.run(
-            ['python3', os.path.join(SCRIPT_DIR, 'compare_backtests.py'), stock_symbol],
+            ['python3', os.path.join(SCRIPT_DIR, '10_compare_backtests.py'), stock_symbol],
             check=True,
             capture_output=False,
             cwd=PROJECT_ROOT
@@ -356,7 +356,7 @@ def run_complete_setup(stock_symbol):
     print("="*80)
     try:
         subprocess.run(
-            ['python3', os.path.join(SCRIPT_DIR, 'generate_analysis_report.py'), stock_symbol],
+            ['python3', os.path.join(SCRIPT_DIR, '11_generate_analysis_report.py'), stock_symbol],
             check=True,
             capture_output=True,
             cwd=PROJECT_ROOT
