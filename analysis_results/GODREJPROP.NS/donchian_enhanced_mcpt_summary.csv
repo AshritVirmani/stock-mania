@@ -1,0 +1,2 @@
+Stock,Strategy,Total Log Return,Annualized Log Return,Average P-Value,Num Walk-Forward Periods,Regime Filtering,Pattern Exit
+GODREJPROP.NS,Enhanced Donchian (Regime Filtered + Pattern Exit),0.8874,0.0660,0.5601,27,✅ Enabled,✅ Enabled

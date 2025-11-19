@@ -32,8 +32,9 @@ class AroonIndicator(IndicatorMixin):
     def __init__(
         self, high: pd.Series, low: pd.Series, window: int = 25, fillna: bool = False
     ):
-        self._high = high
-        self._low = low
+        self._close = high.squeeze()
+        self._high = high.squeeze()
+        self._low = low.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -105,7 +106,7 @@ class MACD(IndicatorMixin):
         window_sign: int = 9,
         fillna: bool = False,
     ):
-        self._close = close
+        self._close = close.squeeze()
         self._window_slow = window_slow
         self._window_fast = window_fast
         self._window_sign = window_sign
@@ -165,7 +166,7 @@ class EMAIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, window: int = 14, fillna: bool = False):
-        self._close = close
+        self._close = close.squeeze()
         self._window = window
         self._fillna = fillna
 
@@ -189,7 +190,7 @@ class SMAIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, window: int, fillna: bool = False):
-        self._close = close
+        self._close = close.squeeze()
         self._window = window
         self._fillna = fillna
 
@@ -213,7 +214,7 @@ class WMAIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, window: int = 9, fillna: bool = False):
-        self._close = close
+        self._close = close.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -261,7 +262,7 @@ class TRIXIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, window: int = 15, fillna: bool = False):
-        self._close = close
+        self._close = close.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -310,8 +311,8 @@ class MassIndex(IndicatorMixin):
         window_slow: int = 25,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
+        self._high = high.squeeze()
+        self._low = low.squeeze()
         self._window_fast = window_fast
         self._window_slow = window_slow
         self._fillna = fillna
@@ -362,8 +363,8 @@ class IchimokuIndicator(IndicatorMixin):
         visual: bool = False,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
+        self._high = high.squeeze()
+        self._low = low.squeeze()
         self._window1 = window1
         self._window2 = window2
         self._window3 = window3
@@ -475,7 +476,7 @@ class KSTIndicator(IndicatorMixin):
         nsig: int = 9,
         fillna: bool = False,
     ):
-        self._close = close
+        self._close = close.squeeze()
         self._r1 = roc1
         self._r2 = roc2
         self._r3 = roc3
@@ -588,7 +589,7 @@ class DPOIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, window: int = 20, fillna: bool = False):
-        self._close = close
+        self._close = close.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -641,9 +642,9 @@ class CCIIndicator(IndicatorMixin):
         constant: float = 0.015,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
         self._window = window
         self._constant = constant
         self._fillna = fillna
@@ -708,9 +709,9 @@ class ADXIndicator(IndicatorMixin):
         window: int = 14,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -885,9 +886,9 @@ class VortexIndicator(IndicatorMixin):
         window: int = 14,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -960,9 +961,9 @@ class PSARIndicator(IndicatorMixin):
         max_step: float = 0.20,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
         self._step = step
         self._max_step = max_step
         self._fillna = fillna
@@ -1122,7 +1123,7 @@ class STCIndicator(IndicatorMixin):
         smooth2: int = 3,
         fillna: bool = False,
     ):
-        self._close = close
+        self._close = close.squeeze()
         self._window_slow = window_slow
         self._window_fast = window_fast
         self._cycle = cycle

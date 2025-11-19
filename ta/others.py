@@ -20,7 +20,7 @@ class DailyReturnIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, fillna: bool = False):
-        self._close = close
+        self._close = close.squeeze()
         self._fillna = fillna
         self._run()
 
@@ -49,7 +49,7 @@ class DailyLogReturnIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, fillna: bool = False):
-        self._close = close
+        self._close = close.squeeze()
         self._fillna = fillna
         self._run()
 
@@ -76,7 +76,7 @@ class CumulativeReturnIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, fillna: bool = False):
-        self._close = close
+        self._close = close.squeeze()
         self._fillna = fillna
         self._run()
 

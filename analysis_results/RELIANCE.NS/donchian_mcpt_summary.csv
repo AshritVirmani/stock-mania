@@ -1,0 +1,2 @@
+Stock,Total Log Return,Annualized Log Return,Average P-Value,Num Walk-Forward Periods,Train Period Days,Test Period Days,MCPT Iterations
+RELIANCE.NS,0.5439014203880297,0.019848136057221286,0.7386545454545455,55,730,182,1000

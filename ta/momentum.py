@@ -28,7 +28,7 @@ class RSIIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, window: int = 14, fillna: bool = False):
-        self._close = close
+        self._close = close.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -81,7 +81,7 @@ class TSIIndicator(IndicatorMixin):
         window_fast: int = 13,
         fillna: bool = False,
     ):
-        self._close = close
+        self._close = close.squeeze()
         self._window_slow = window_slow
         self._window_fast = window_fast
         self._fillna = fillna
@@ -161,9 +161,9 @@ class UltimateOscillator(IndicatorMixin):
         weight3: float = 1.0,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
         self._window1 = window1
         self._window2 = window2
         self._window3 = window3
@@ -242,9 +242,9 @@ class StochasticOscillator(IndicatorMixin):
         smooth_window: int = 3,
         fillna: bool = False,
     ):
-        self._close = close
-        self._high = high
-        self._low = low
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
         self._window = window
         self._smooth_window = smooth_window
         self._fillna = fillna
@@ -307,7 +307,7 @@ class KAMAIndicator(IndicatorMixin):
         pow2: int = 30,
         fillna: bool = False,
     ):
-        self._close = close
+        self._close = close.squeeze()
         self._window = window
         self._pow1 = pow1
         self._pow2 = pow2
@@ -384,7 +384,7 @@ class ROCIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, window: int = 12, fillna: bool = False):
-        self._close = close
+        self._close = close.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -447,8 +447,8 @@ class AwesomeOscillatorIndicator(IndicatorMixin):
         window2: int = 34,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
+        self._high = high.squeeze()
+        self._low = low.squeeze()
         self._window1 = window1
         self._window2 = window2
         self._fillna = fillna
@@ -519,9 +519,9 @@ class WilliamsRIndicator(IndicatorMixin):
         lbp: int = 14,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
         self._lbp = lbp
         self._fillna = fillna
         self._run()
@@ -573,7 +573,7 @@ class StochRSIIndicator(IndicatorMixin):
         smooth2: int = 3,
         fillna: bool = False,
     ):
-        self._close = close
+        self._close = close.squeeze()
         self._window = window
         self._smooth1 = smooth1
         self._smooth2 = smooth2
@@ -642,7 +642,7 @@ class PercentagePriceOscillator(IndicatorMixin):
         window_sign: int = 9,
         fillna: bool = False,
     ):
-        self._close = close
+        self._close = close.squeeze()
         self._window_slow = window_slow
         self._window_fast = window_fast
         self._window_sign = window_sign
@@ -716,7 +716,7 @@ class PercentageVolumeOscillator(IndicatorMixin):
         window_sign: int = 9,
         fillna: bool = False,
     ):
-        self._volume = volume
+        self._volume = volume.squeeze()
         self._window_slow = window_slow
         self._window_fast = window_fast
         self._window_sign = window_sign

@@ -1,0 +1,2 @@
+Stock,Strategy,Total Log Return,P-Value,Best Lookback,Training Days,Testing Days,Note
+SWIGGY.NS,Simple Donchian (70/30 split),0.0000,1.0000,115,173,75,Simple backtest (insufficient data for walk-forward)

@@ -37,10 +37,10 @@ class AccDistIndexIndicator(IndicatorMixin):
         volume: pd.Series,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
-        self._volume = volume
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
+        self._volume = volume.squeeze()
         self._fillna = fillna
         self._run()
 
@@ -77,8 +77,8 @@ class OnBalanceVolumeIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, volume: pd.Series, fillna: bool = False):
-        self._close = close
-        self._volume = volume
+        self._close = close.squeeze()
+        self._volume = volume.squeeze()
         self._fillna = fillna
         self._run()
 
@@ -121,10 +121,10 @@ class ChaikinMoneyFlowIndicator(IndicatorMixin):
         window: int = 20,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
-        self._volume = volume
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
+        self._volume = volume.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -174,8 +174,8 @@ class ForceIndexIndicator(IndicatorMixin):
         window: int = 13,
         fillna: bool = False,
     ):
-        self._close = close
-        self._volume = volume
+        self._close = close.squeeze()
+        self._volume = volume.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -218,9 +218,9 @@ class EaseOfMovementIndicator(IndicatorMixin):
         window: int = 14,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._volume = volume
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._volume = volume.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -279,8 +279,8 @@ class VolumePriceTrendIndicator(IndicatorMixin):
         smoothing_factor: tp.Optional[int] = None,
         dropnans: bool = False,
     ):
-        self._close = close
-        self._volume = volume
+        self._close = close.squeeze()
+        self._volume = volume.squeeze()
         self._fillna = fillna
         self._smoothing_factor = smoothing_factor
         self._dropnans = dropnans
@@ -318,8 +318,8 @@ class NegativeVolumeIndexIndicator(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, volume: pd.Series, fillna: bool = False):
-        self._close = close
-        self._volume = volume
+        self._close = close.squeeze()
+        self._volume = volume.squeeze()
         self._fillna = fillna
         self._run()
 
@@ -376,10 +376,10 @@ class MFIIndicator(IndicatorMixin):
         window: int = 14,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
-        self._volume = volume
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
+        self._volume = volume.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -453,10 +453,10 @@ class VolumeWeightedAveragePrice(IndicatorMixin):
         window: int = 14,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
-        self._volume = volume
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
+        self._volume = volume.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()

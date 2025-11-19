@@ -36,9 +36,9 @@ class AverageTrueRange(IndicatorMixin):
         window: int = 14,
         fillna: bool = False,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
@@ -83,7 +83,7 @@ class BollingerBands(IndicatorMixin):
         window_dev: int = 2,
         fillna: bool = False,
     ):
-        self._close = close
+        self._close = close.squeeze()
         self._window = window
         self._window_dev = window_dev
         self._fillna = fillna
@@ -213,9 +213,9 @@ class KeltnerChannel(IndicatorMixin):
         original_version: bool = True,
         multiplier: int = 2,
     ):
-        self._high = high
-        self._low = low
-        self._close = close
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
         self._window = window
         self._window_atr = window_atr
         self._fillna = fillna
@@ -353,11 +353,11 @@ class DonchianChannel(IndicatorMixin):
         offset: int = 0,
         fillna: bool = False,
     ):
-        self._offset = offset
-        self._close = close
-        self._high = high
-        self._low = low
+        self._high = high.squeeze()
+        self._low = low.squeeze()
+        self._close = close.squeeze()
         self._window = window
+        self._offset = offset
         self._fillna = fillna
         self._run()
 
@@ -442,7 +442,7 @@ class UlcerIndex(IndicatorMixin):
     """
 
     def __init__(self, close: pd.Series, window: int = 14, fillna: bool = False):
-        self._close = close
+        self._close = close.squeeze()
         self._window = window
         self._fillna = fillna
         self._run()
