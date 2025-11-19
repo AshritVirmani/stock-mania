@@ -21,6 +21,14 @@ def get_ticker_output_dir(stock_symbol):
         os.makedirs(ticker_dir)
     return ticker_dir
 
+
+def get_backtests_dir(stock_symbol, strategy="standard"):
+    """Get backtests subdirectory for strategy results."""
+    backtests_dir = os.path.join(get_ticker_output_dir(stock_symbol), "backtests", strategy)
+    if not os.path.exists(backtests_dir):
+        os.makedirs(backtests_dir)
+    return backtests_dir
+
 def plot_equity_curve(results_df, output_path):
     """Plots the cumulative log returns over time."""
     plt.style.use('seaborn-v0_8-whitegrid')
@@ -166,13 +174,8 @@ def generate_html_report(summary_df, results_df, stock_symbol, output_dir):
         <h2>Summary</h2>
         {{ summary_table }}
         <h2>Walk-Forward Performance</h2>
-        <img src="donchian_equity_curve.png" alt="Equity Curve">
-        <h2>P-Value Distribution</h2>
-        <img src="donchian_p_value_dist.png" alt="P-Value Distribution">
-        <h2>Real vs Permuted Strategy Comparison</h2>
-        <img src="donchian_actual_vs_permuted.png" alt="Actual vs Permuted Strategies">
-        <p><em>This chart shows the actual strategy performance (red line) compared to permuted/random strategies (grey lines). 
-        If the red line is clearly above the grey cluster, the strategy is statistically significant.</em></p>
+        <img src="equity_curve.png" alt="Equity Curve">
+        <p><em>This chart shows the cumulative log returns over time for the Donchian strategy.</em></p>
     </body>
     </html>
     """)
@@ -184,7 +187,7 @@ def generate_html_report(summary_df, results_df, stock_symbol, output_dir):
         summary_table=summary_table_html
     )
     
-    report_path = os.path.join(output_dir, "donchian_mcpt_report.html")
+    report_path = os.path.join(output_dir, "report.html")
     with open(report_path, 'w') as f:
         f.write(html_content)
     print(f"📄 HTML report generated at: {report_path}")
@@ -206,7 +209,7 @@ def main():
         return
 
     stock_symbol = os.path.basename(file_path).replace('_analysis.csv', '')
-    output_dir = get_ticker_output_dir(stock_symbol)
+    output_dir = get_backtests_dir(stock_symbol, "standard")
 
     # --- 2. Load Data ---
     print(f"🔄 Loading data for {stock_symbol}...")
@@ -256,8 +259,8 @@ def main():
     print(f"Interpretation: A low 'Average P-Value' (e.g., < 0.10) suggests the strategy's positive returns are statistically significant and not likely due to random chance.")
 
     # Save results
-    walkforward_results_path = os.path.join(output_dir, "donchian_walkforward_results.csv")
-    summary_path = os.path.join(output_dir, "donchian_mcpt_summary.csv")
+    walkforward_results_path = os.path.join(output_dir, "results.csv")
+    summary_path = os.path.join(output_dir, "summary.csv")
     
     results_df.to_csv(walkforward_results_path, index=False)
     summary_df.to_csv(summary_path, index=False)
@@ -276,17 +279,10 @@ def main():
 
     # --- 5. Generate Visualizations and Report ---
     print("\n🎨 Generating visualizations...")
-    equity_curve_path = os.path.join(output_dir, "donchian_equity_curve.png")
-    p_value_dist_path = os.path.join(output_dir, "donchian_p_value_dist.png")
-    actual_vs_permuted_path = os.path.join(output_dir, "donchian_actual_vs_permuted.png")
-
+    # Keep only essential visualization (equity curve)
+    equity_curve_path = os.path.join(output_dir, "equity_curve.png")
     plot_equity_curve(results_df, equity_curve_path)
-    plot_p_value_distribution(results_df, p_value_dist_path)
-    plot_actual_vs_permuted(results_df, actual_vs_permuted_path)
-    
     print(f"📈 Equity curve plot saved to: {equity_curve_path}")
-    print(f"📈 P-Value distribution plot saved to: {p_value_dist_path}")
-    print(f"📈 Actual vs Permuted comparison saved to: {actual_vs_permuted_path}")
 
     generate_html_report(summary_df, results_df, stock_symbol, output_dir)
 

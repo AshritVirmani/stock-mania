@@ -21,8 +21,12 @@ import sys
 import subprocess
 import pandas as pd
 
-OUTPUT_DIR = "output"
-BASE_ANALYSIS_DIR = "analysis_results"
+# Get the directory where this script is located
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Get the parent directory (project root)
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+
+BASE_ANALYSIS_DIR = os.path.join(PROJECT_ROOT, "analysis_results")
 
 
 def get_ticker_analysis_dir(stock_symbol):
@@ -31,6 +35,46 @@ def get_ticker_analysis_dir(stock_symbol):
     if not os.path.exists(ticker_dir):
         os.makedirs(ticker_dir)
     return ticker_dir
+
+
+def get_data_dir(stock_symbol):
+    """Get data subdirectory for main analysis CSV."""
+    data_dir = os.path.join(get_ticker_analysis_dir(stock_symbol), "data")
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+    return data_dir
+
+
+def get_analysis_dir(stock_symbol):
+    """Get analysis subdirectory for correlation, regimes, similarity."""
+    analysis_dir = os.path.join(get_ticker_analysis_dir(stock_symbol), "analysis")
+    if not os.path.exists(analysis_dir):
+        os.makedirs(analysis_dir)
+    return analysis_dir
+
+
+def get_backtests_dir(stock_symbol, strategy="standard"):
+    """Get backtests subdirectory for strategy results."""
+    backtests_dir = os.path.join(get_ticker_analysis_dir(stock_symbol), "backtests", strategy)
+    if not os.path.exists(backtests_dir):
+        os.makedirs(backtests_dir)
+    return backtests_dir
+
+
+def get_valuation_dir(stock_symbol):
+    """Get valuation subdirectory for intrinsic value results."""
+    valuation_dir = os.path.join(get_ticker_analysis_dir(stock_symbol), "valuation")
+    if not os.path.exists(valuation_dir):
+        os.makedirs(valuation_dir)
+    return valuation_dir
+
+
+def get_reports_dir(stock_symbol):
+    """Get reports subdirectory for final reports."""
+    reports_dir = os.path.join(get_ticker_analysis_dir(stock_symbol), "reports")
+    if not os.path.exists(reports_dir):
+        os.makedirs(reports_dir)
+    return reports_dir
 
 
 def run_complete_setup(stock_symbol):
@@ -48,11 +92,13 @@ def run_complete_setup(stock_symbol):
     
     try:
         result = subprocess.run(
-            ['python3', 'analyze_indian_stocks.py', stock_symbol],
+            ['python3', os.path.join(SCRIPT_DIR, 'analyze_indian_stocks.py'), stock_symbol],
             check=True,
-            capture_output=False
+            capture_output=False,
+            cwd=PROJECT_ROOT
         )
-        analysis_file = os.path.join(OUTPUT_DIR, f"{stock_symbol}_analysis.csv")
+        data_dir = get_data_dir(stock_symbol)
+        analysis_file = os.path.join(data_dir, f"{stock_symbol}_analysis.csv")
         
         if not os.path.exists(analysis_file):
             print(f"❌ Failed to generate analysis file")
@@ -66,30 +112,78 @@ def run_complete_setup(stock_symbol):
         print(f"\n⚠️  Setup cancelled by user")
         return False
     
-    # Step 2: Correlation Analysis
+    # Step 2: Intrinsic Value Calculation
     print("\n" + "="*80)
-    print("STEP 2: Correlation Analysis")
+    print("STEP 2: Intrinsic Value Calculation")
+    print("="*80)
+    print("💰 Calculating intrinsic value using multiple valuation methods...")
+    print("   (Output will be displayed and saved to valuation folder)\n")
+    try:
+        # Use the calculate_intrinsic_value.py from project root (not legacy_scripts)
+        calc_script = os.path.join(PROJECT_ROOT, 'calculate_intrinsic_value.py')
+        valuation_dir = get_valuation_dir(stock_symbol)
+        output_file = os.path.join(valuation_dir, "valuation_output.txt")
+        
+        # Run the script and capture output while displaying it
+        result = subprocess.run(
+            ['python3', calc_script, stock_symbol],
+            check=True,
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_ROOT
+        )
+        
+        # Display the output
+        print(result.stdout)
+        if result.stderr:
+            print(result.stderr, file=sys.stderr)
+        
+        # Save output to text file
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(result.stdout)
+            if result.stderr:
+                f.write("\n\n--- ERRORS/WARNINGS ---\n")
+                f.write(result.stderr)
+        
+        print(f"\n✅ Intrinsic value calculation complete")
+        print(f"   - Intrinsic value calculated using 5 methods (Graham, DCF, P/E, P/B, PEG)")
+        print(f"   - Results saved to valuation/intrinsic_value.json")
+        print(f"   - Terminal output saved to valuation/valuation_output.txt")
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️  Intrinsic value calculation failed: {e}")
+        if hasattr(e, 'stdout') and e.stdout:
+            print(e.stdout)
+        if hasattr(e, 'stderr') and e.stderr:
+            print(e.stderr, file=sys.stderr)
+    except Exception as e:
+        print(f"⚠️  Intrinsic value calculation error: {e}")
+    
+    # Step 3: Correlation Analysis
+    print("\n" + "="*80)
+    print("STEP 3: Correlation Analysis")
     print("="*80)
     try:
         subprocess.run(
-            ['python3', 'analyze_correlations.py', analysis_file],
+            ['python3', os.path.join(SCRIPT_DIR, 'analyze_correlations.py'), analysis_file],
             check=True,
-            capture_output=True
+            capture_output=True,
+            cwd=PROJECT_ROOT
         )
         print("✅ Correlation analysis complete")
     except subprocess.CalledProcessError as e:
         print(f"⚠️  Correlation analysis failed: {e}")
     
-    # Step 3: Behavioral Pattern Analysis
+    # Step 4: Behavioral Pattern Analysis
     print("\n" + "="*80)
-    print("STEP 3: Behavioral Pattern Analysis (Market Regimes)")
+    print("STEP 4: Behavioral Pattern Analysis (Market Regimes)")
     print("="*80)
     print("🔍 Identifying market regimes (this may take a few minutes)...")
     try:
         subprocess.run(
-            ['python3', 'behavioral_patterns.py', analysis_file],
+            ['python3', os.path.join(SCRIPT_DIR, 'behavioral_patterns.py'), analysis_file],
             check=True,
-            capture_output=True
+            capture_output=True,
+            cwd=PROJECT_ROOT
         )
         print("✅ Behavioral pattern analysis complete")
         print("   - Market regimes identified")
@@ -98,26 +192,27 @@ def run_complete_setup(stock_symbol):
         print(f"⚠️  Behavioral pattern analysis failed: {e}")
         print("   ⚠️  Enhanced Donchian will run without regime filtering")
     
-    # Step 4: Identify Red Light Regime
+    # Step 5: Identify Red Light Regime
     print("\n" + "="*80)
     print("STEP 4: Identifying Red Light Regime")
     print("="*80)
-    ticker_dir = get_ticker_analysis_dir(stock_symbol)
-    regime_file = os.path.join(ticker_dir, "data_with_regimes.csv")
+    analysis_dir = get_analysis_dir(stock_symbol)
+    regime_file = os.path.join(analysis_dir, "data_with_regimes.csv")
     
     if os.path.exists(regime_file):
         try:
             subprocess.run(
-                ['python3', 'identify_red_light_regime.py', regime_file],
+                ['python3', os.path.join(SCRIPT_DIR, 'identify_red_light_regime.py'), regime_file],
                 check=True,
-                capture_output=False
+                capture_output=False,
+                cwd=PROJECT_ROOT
             )
         except Exception as e:
             print(f"⚠️  Red Light identification failed: {e}")
     else:
         print("⚠️  Regime data not found. Skipping Red Light identification.")
     
-    # Step 5: Similarity Analysis
+    # Step 6: Similarity Analysis
     print("\n" + "="*80)
     print("STEP 5: Similarity Analysis")
     print("="*80)
@@ -128,9 +223,10 @@ def run_complete_setup(stock_symbol):
             latest_date = df.index.max().strftime('%Y-%m-%d')
             print(f"📅 Analyzing similarity for latest date: {latest_date}")
             subprocess.run(
-                ['python3', 'find_similar_days.py', latest_date, analysis_file],
+                ['python3', os.path.join(SCRIPT_DIR, 'find_similar_days.py'), latest_date, analysis_file],
                 check=True,
-                capture_output=True
+                capture_output=True,
+                cwd=PROJECT_ROOT
             )
             print(f"✅ Similarity analysis complete for {latest_date}")
         except Exception as e:
@@ -138,13 +234,14 @@ def run_complete_setup(stock_symbol):
     else:
         print("⚠️  Regime data not found. Skipping similarity analysis.")
     
-    # Step 6: Standard Donchian MCPT Backtest
+    # Step 7: Standard Donchian MCPT Backtest
     print("\n" + "="*80)
     print("STEP 6: Standard Donchian MCPT Backtest")
     print("="*80)
     
     # Check data requirements first
     try:
+        sys.path.insert(0, SCRIPT_DIR)
         from walkforward_mcpt import load_stock_data
         ohlc_data = load_stock_data(analysis_file)
         if ohlc_data is not None:
@@ -157,9 +254,10 @@ def run_complete_setup(stock_symbol):
                 print(f"\n💡 Running Simple Backtest instead (70/30 split)...")
                 try:
                     subprocess.run(
-                        ['python3', 'simple_backtest_for_new_stocks.py', analysis_file],
+                        ['python3', os.path.join(SCRIPT_DIR, 'simple_backtest_for_new_stocks.py'), analysis_file],
                         check=True,
-                        capture_output=False
+                        capture_output=False,
+                        cwd=PROJECT_ROOT
                     )
                     print("✅ Simple backtest complete")
                 except Exception as e:
@@ -169,9 +267,10 @@ def run_complete_setup(stock_symbol):
             else:
                 print("📊 Running walk-forward analysis with Monte Carlo Permutation Test...")
                 result = subprocess.run(
-                    ['python3', 'donchian_mcpt_backtest.py', analysis_file],
+                    ['python3', os.path.join(SCRIPT_DIR, 'donchian_mcpt_backtest.py'), analysis_file],
                     check=True,
-                    capture_output=False
+                    capture_output=False,
+                    cwd=PROJECT_ROOT
                 )
                 print("✅ Standard Donchian MCPT backtest complete")
         else:
@@ -181,13 +280,14 @@ def run_complete_setup(stock_symbol):
     except Exception as e:
         print(f"⚠️  Error checking data requirements: {e}")
     
-    # Step 7: Enhanced Donchian MCPT Backtest
+    # Step 8: Enhanced Donchian MCPT Backtest
     print("\n" + "="*80)
     print("STEP 7: Enhanced Donchian MCPT Backtest")
     print("="*80)
     
     # Check data requirements first
     try:
+        sys.path.insert(0, SCRIPT_DIR)
         from walkforward_mcpt import load_stock_data
         ohlc_data = load_stock_data(analysis_file)
         if ohlc_data is not None:
@@ -204,9 +304,10 @@ def run_complete_setup(stock_symbol):
                 print("   - Pattern-based early exits (-2.0% threshold, 10 similar days)")
                 print("   - Walk-forward MCPT")
                 result = subprocess.run(
-                    ['python3', 'donchian_enhanced_backtest.py', analysis_file],
+                    ['python3', os.path.join(SCRIPT_DIR, 'donchian_enhanced_backtest.py'), analysis_file],
                     check=True,
-                    capture_output=False
+                    capture_output=False,
+                    cwd=PROJECT_ROOT
                 )
                 print("✅ Enhanced Donchian MCPT backtest complete")
         else:
@@ -216,17 +317,19 @@ def run_complete_setup(stock_symbol):
     except Exception as e:
         print(f"⚠️  Error checking data requirements: {e}")
     
-    # Step 8: Drawdown Analysis
+    # Step 9: Drawdown Analysis
     print("\n" + "="*80)
-    print("STEP 8: Drawdown Analysis")
+    print("STEP 9: Drawdown Analysis")
     print("="*80)
-    walkforward_file = os.path.join(ticker_dir, "donchian_walkforward_results.csv")
+    backtests_standard_dir = get_backtests_dir(stock_symbol, "standard")
+    walkforward_file = os.path.join(backtests_standard_dir, "results.csv")
     if os.path.exists(walkforward_file) and os.path.exists(regime_file):
         try:
             subprocess.run(
-                ['python3', 'analyze_drawdowns.py', walkforward_file, regime_file],
+                ['python3', os.path.join(SCRIPT_DIR, 'analyze_drawdowns.py'), walkforward_file, regime_file],
                 check=True,
-                capture_output=False
+                capture_output=False,
+                cwd=PROJECT_ROOT
             )
         except Exception as e:
             print(f"⚠️  Drawdown analysis failed: {e}")
@@ -239,22 +342,24 @@ def run_complete_setup(stock_symbol):
     print("="*80)
     try:
         subprocess.run(
-            ['python3', 'compare_backtests.py', stock_symbol],
+            ['python3', os.path.join(SCRIPT_DIR, 'compare_backtests.py'), stock_symbol],
             check=True,
-            capture_output=False
+            capture_output=False,
+            cwd=PROJECT_ROOT
         )
     except Exception as e:
         print(f"⚠️  Comparison failed: {e}")
     
-    # Step 10: Generate Comprehensive Report
+    # Step 11: Generate Comprehensive Report
     print("\n" + "="*80)
-    print("STEP 10: Generating Comprehensive Report")
+    print("STEP 11: Generating Comprehensive Report")
     print("="*80)
     try:
         subprocess.run(
-            ['python3', 'generate_analysis_report.py', stock_symbol],
+            ['python3', os.path.join(SCRIPT_DIR, 'generate_analysis_report.py'), stock_symbol],
             check=True,
-            capture_output=True
+            capture_output=True,
+            cwd=PROJECT_ROOT
         )
         print("✅ Comprehensive report generated")
     except subprocess.CalledProcessError as e:
@@ -262,27 +367,29 @@ def run_complete_setup(stock_symbol):
     
     # Final Summary
     print("\n" + "="*80)
-    print("✅ COMPLETE SETUP FINISHED FOR {stock_symbol}")
+    print(f"✅ COMPLETE SETUP FINISHED FOR {stock_symbol}")
     print("="*80)
     
     ticker_dir = get_ticker_analysis_dir(stock_symbol)
     print(f"\n📁 All results saved in: {ticker_dir}/")
     print("\n📊 Key Files Generated:")
-    print(f"   ✅ Analysis data: output/{stock_symbol}_analysis.csv")
-    print(f"   ✅ Correlation heatmap: {ticker_dir}/correlation_heatmap_full.png")
-    print(f"   ✅ Market regimes: {ticker_dir}/market_regimes_plot.png")
-    print(f"   ✅ Regime data: {ticker_dir}/data_with_regimes.csv")
-    print(f"   ✅ Standard Donchian results: {ticker_dir}/donchian_walkforward_results_readable_summary.csv")
-    print(f"   ✅ Enhanced Donchian results: {ticker_dir}/donchian_enhanced_walkforward_results_readable_summary.csv")
-    print(f"   ✅ Comprehensive report: {ticker_dir}/comprehensive_report.html")
-    print(f"   ✅ Strategy comparison: {ticker_dir}/backtest_comparison.csv")
+    print(f"   ✅ Analysis data: data/{stock_symbol}_analysis.csv")
+    print(f"   ✅ Valuation: valuation/intrinsic_value.json")
+    print(f"   ✅ Valuation output: valuation/valuation_output.txt")
+    print(f"   ✅ Correlation heatmap: analysis/correlation_heatmap.png")
+    print(f"   ✅ Market regimes: analysis/market_regimes_plot.png")
+    print(f"   ✅ Regime data: analysis/data_with_regimes.csv")
+    print(f"   ✅ Standard Donchian: backtests/standard/results.csv")
+    print(f"   ✅ Enhanced Donchian: backtests/enhanced/results.csv")
+    print(f"   ✅ Comprehensive report: reports/comprehensive_report.html")
+    print(f"   ✅ Strategy comparison: reports/backtest_comparison.csv")
     
     print("\n💡 Quick Commands:")
     print(f"   # View simple summary:")
-    print(f"   python3 donchian_simple_summary.py {ticker_dir}/donchian_walkforward_results.csv")
-    print(f"   python3 donchian_simple_summary.py {ticker_dir}/donchian_enhanced_walkforward_results.csv")
+    print(f"   python3 donchian_simple_summary.py {ticker_dir}/backtests/standard/results.csv")
+    print(f"   python3 donchian_simple_summary.py {ticker_dir}/backtests/enhanced/results.csv")
     print(f"   # View comprehensive report:")
-    print(f"   open {ticker_dir}/comprehensive_report.html")
+    print(f"   open {ticker_dir}/reports/comprehensive_report.html")
     
     return True
 
@@ -297,14 +404,15 @@ def main():
         print("  python3 complete_setup.py INFY.NS")
         print("\nThis will run the complete analysis workflow:")
         print("  1. Fetch data and calculate indicators")
-        print("  2. Correlation analysis")
-        print("  3. Behavioral pattern analysis")
-        print("  4. Similarity analysis")
-        print("  5. Standard Donchian MCPT backtest")
-        print("  6. Enhanced Donchian MCPT backtest")
-        print("  7. Drawdown analysis")
-        print("  8. Strategy comparison")
-        print("  9. Comprehensive report")
+        print("  2. Intrinsic value calculation")
+        print("  3. Correlation analysis")
+        print("  4. Behavioral pattern analysis")
+        print("  5. Similarity analysis")
+        print("  6. Standard Donchian MCPT backtest")
+        print("  7. Enhanced Donchian MCPT backtest")
+        print("  8. Drawdown analysis")
+        print("  9. Strategy comparison")
+        print("  10. Comprehensive report")
         return
     
     stock_symbol = sys.argv[1].strip().upper()

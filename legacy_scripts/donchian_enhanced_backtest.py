@@ -32,6 +32,22 @@ def get_ticker_output_dir(stock_symbol):
     return ticker_dir
 
 
+def get_backtests_dir(stock_symbol, strategy="enhanced"):
+    """Get backtests subdirectory for strategy results."""
+    backtests_dir = os.path.join(get_ticker_output_dir(stock_symbol), "backtests", strategy)
+    if not os.path.exists(backtests_dir):
+        os.makedirs(backtests_dir)
+    return backtests_dir
+
+
+def get_analysis_dir(stock_symbol):
+    """Get analysis subdirectory for correlation, regimes, similarity."""
+    analysis_dir = os.path.join(get_ticker_output_dir(stock_symbol), "analysis")
+    if not os.path.exists(analysis_dir):
+        os.makedirs(analysis_dir)
+    return analysis_dir
+
+
 class EnhancedWalkForwardAnalysis:
     """
     Walk-forward analysis with enhanced Donchian strategy.
@@ -197,7 +213,11 @@ def main():
         return
     
     stock_symbol = os.path.basename(file_path).replace('_analysis.csv', '').replace('.csv', '')
-    output_dir = get_ticker_output_dir(stock_symbol)
+    output_dir = get_backtests_dir(stock_symbol, "enhanced")
+    
+    # Try to find regime data in analysis directory
+    analysis_dir = get_analysis_dir(stock_symbol)
+    regime_path = os.path.join(analysis_dir, "data_with_regimes.csv")
     
     print(f"🔄 Loading OHLCV data for {stock_symbol}...")
     ohlc_data = load_stock_data(file_path)
@@ -206,8 +226,7 @@ def main():
     
     print(f"✅ OHLCV data loaded successfully. Shape: {ohlc_data.shape}")
     
-    # Check if regime data exists
-    regime_path = os.path.join(output_dir, "data_with_regimes.csv")
+    # Check if regime data exists (already set above)
     use_regime_filter = os.path.exists(regime_path)
     
     if not use_regime_filter:
@@ -268,8 +287,8 @@ def main():
     print("="*80)
     
     # Save results
-    output_path = os.path.join(output_dir, "donchian_enhanced_walkforward_results.csv")
-    summary_path = os.path.join(output_dir, "donchian_enhanced_mcpt_summary.csv")
+    output_path = os.path.join(output_dir, "results.csv")
+    summary_path = os.path.join(output_dir, "summary.csv")
     
     results_df.to_csv(output_path, index=False)
     summary_df.to_csv(summary_path, index=False)

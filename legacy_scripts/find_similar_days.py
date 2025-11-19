@@ -21,7 +21,7 @@ import numpy as np
 
 # Directory for output plots and data
 BASE_OUTPUT_DIR = "analysis_results"
-DEFAULT_STOCK_FILE = "output/RELIANCE.NS_analysis.csv"
+DEFAULT_STOCK_FILE = "output/RELIANCE.NS_analysis.csv"  # Kept for backward compatibility
 
 
 def get_ticker_output_dir(stock_symbol):
@@ -30,6 +30,31 @@ def get_ticker_output_dir(stock_symbol):
     if not os.path.exists(ticker_dir):
         os.makedirs(ticker_dir)
     return ticker_dir
+
+
+def get_analysis_dir(stock_symbol):
+    """Get analysis subdirectory for correlation, regimes, similarity."""
+    analysis_dir = os.path.join(get_ticker_output_dir(stock_symbol), "analysis")
+    if not os.path.exists(analysis_dir):
+        os.makedirs(analysis_dir)
+    return analysis_dir
+
+
+def find_analysis_file(stock_symbol):
+    """Find analysis file in ticker-specific folder first, then fallback to old location."""
+    # New location: ticker-specific folder
+    ticker_dir = os.path.join(BASE_OUTPUT_DIR, stock_symbol)
+    new_path = os.path.join(ticker_dir, f"{stock_symbol}_analysis.csv")
+    if os.path.exists(new_path):
+        return new_path
+    
+    # Old location: output folder (for backward compatibility)
+    old_path = os.path.join("output", f"{stock_symbol}_analysis.csv")
+    if os.path.exists(old_path):
+        return old_path
+    
+    # Return new path as default (will be created there)
+    return new_path
 
 
 def load_analysis_data(file_path):
@@ -240,12 +265,12 @@ def main():
     print(results_df.to_string(float_format="%.4f"))
     print("="*90)
     
-    # 4. Save results to CSV
-    ticker_dir = get_ticker_output_dir(stock_symbol)
-    output_path = os.path.join(ticker_dir, f"similar_days_euclidean_{target_date}.csv")
+    # 4. Save results to CSV in analysis subdirectory (no date suffix, always latest)
+    analysis_dir = get_analysis_dir(stock_symbol)
+    output_path = os.path.join(analysis_dir, "similar_days_latest.csv")
     results_df.to_csv(output_path)
     print(f"\n💾 Results saved to {output_path}")
-    print(f"📁 All results saved in: {ticker_dir}/")
+    print(f"📁 All results saved in: {analysis_dir}/")
 
 
 if __name__ == "__main__":

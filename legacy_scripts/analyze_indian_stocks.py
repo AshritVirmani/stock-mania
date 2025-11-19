@@ -4,8 +4,8 @@ import pandas as pd
 import ta
 import yfinance as yf
 
-# Directory to save output files
-OUTPUT_DIR = "output"
+# Base directory for analysis results
+BASE_ANALYSIS_DIR = "analysis_results"
 
 
 def fetch_stock_data(symbol, start_date=None):
@@ -81,18 +81,32 @@ def analyze_stock(df):
     return df_ta
 
 
+def get_ticker_analysis_dir(symbol):
+    """Get ticker-specific analysis directory."""
+    ticker_dir = os.path.join(BASE_ANALYSIS_DIR, symbol)
+    if not os.path.exists(ticker_dir):
+        os.makedirs(ticker_dir)
+    return ticker_dir
+
+
+def get_data_dir(symbol):
+    """Get data subdirectory for main analysis CSV."""
+    data_dir = os.path.join(get_ticker_analysis_dir(symbol), "data")
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+    return data_dir
+
+
 def save_to_csv(df, symbol):
     """
-    Saves the DataFrame to a CSV file.
+    Saves the DataFrame to a CSV file in the data/ subdirectory.
 
     Args:
         df (pandas.DataFrame): The DataFrame to save.
         symbol (str): The stock symbol, used for the filename.
     """
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
-    
-    filename = os.path.join(OUTPUT_DIR, f"{symbol}_analysis.csv")
+    data_dir = get_data_dir(symbol)
+    filename = os.path.join(data_dir, f"{symbol}_analysis.csv")
     df.to_csv(filename)
     print(f"Analysis saved to {filename}")
 

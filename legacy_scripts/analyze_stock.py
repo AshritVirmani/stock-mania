@@ -22,8 +22,9 @@ import os
 import sys
 import subprocess
 
-OUTPUT_DIR = "output"
 BASE_ANALYSIS_DIR = "analysis_results"
+# Keep OUTPUT_DIR for backward compatibility when searching for existing files
+OUTPUT_DIR = "output"
 
 
 def get_ticker_analysis_dir(stock_symbol):
@@ -35,17 +36,47 @@ def get_ticker_analysis_dir(stock_symbol):
 
 
 def find_available_stocks():
-    """Find all available stock analysis files."""
-    if not os.path.exists(OUTPUT_DIR):
-        return []
-    files = [f.replace('_analysis.csv', '') for f in os.listdir(OUTPUT_DIR) 
-             if f.endswith('_analysis.csv')]
-    return sorted(files)
+    """Find all available stocks from analysis files in both new and old locations."""
+    stocks = set()
+    
+    # Check new location (ticker-specific folders)
+    if os.path.exists(BASE_ANALYSIS_DIR):
+        for ticker_dir in os.listdir(BASE_ANALYSIS_DIR):
+            ticker_path = os.path.join(BASE_ANALYSIS_DIR, ticker_dir)
+            if os.path.isdir(ticker_path):
+                analysis_file = os.path.join(ticker_path, f"{ticker_dir}_analysis.csv")
+                if os.path.exists(analysis_file):
+                    stocks.add(ticker_dir)
+    
+    # Check old location (output folder) for backward compatibility
+    if os.path.exists(OUTPUT_DIR):
+        files = [f.replace('_analysis.csv', '') for f in os.listdir(OUTPUT_DIR) 
+                 if f.endswith('_analysis.csv')]
+        stocks.update(files)
+    
+    return sorted(stocks)
+
+
+def get_analysis_file_path(stock_symbol):
+    """Get analysis file path, checking ticker-specific folder first, then old location."""
+    # New location: ticker-specific folder
+    ticker_dir = os.path.join(BASE_ANALYSIS_DIR, stock_symbol)
+    new_path = os.path.join(ticker_dir, f"{stock_symbol}_analysis.csv")
+    if os.path.exists(new_path):
+        return new_path
+    
+    # Old location: output folder (for backward compatibility)
+    old_path = os.path.join(OUTPUT_DIR, f"{stock_symbol}_analysis.csv")
+    if os.path.exists(old_path):
+        return old_path
+    
+    # Return new path as default (will be created there)
+    return new_path
 
 
 def ensure_analysis_exists(stock_symbol):
     """Check if analysis file exists, if not, generate it."""
-    analysis_file = os.path.join(OUTPUT_DIR, f"{stock_symbol}_analysis.csv")
+    analysis_file = get_analysis_file_path(stock_symbol)
     
     if os.path.exists(analysis_file):
         return True
@@ -58,7 +89,8 @@ def ensure_analysis_exists(stock_symbol):
         subprocess.run(['python3', 'analyze_indian_stocks.py', stock_symbol], 
                       check=True)
         
-        # Check if file was created
+        # Check if file was created (in new location)
+        analysis_file = get_analysis_file_path(stock_symbol)
         if os.path.exists(analysis_file):
             print(f"\n✅ Analysis file generated successfully!")
             return True
@@ -83,7 +115,7 @@ def run_analysis(stock_symbol, run_all=False):
     if not ensure_analysis_exists(stock_symbol):
         return False
     
-    analysis_file = os.path.join(OUTPUT_DIR, f"{stock_symbol}_analysis.csv")
+    analysis_file = get_analysis_file_path(stock_symbol)
     
     # Step 1: Correlation Analysis
     print("1️⃣  Running correlation analysis...")

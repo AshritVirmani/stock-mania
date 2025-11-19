@@ -1,2 +1,2 @@
 Stock,Strategy,Total Log Return,Annualized Log Return,Average P-Value,Num Walk-Forward Periods,Regime Filtering,Pattern Exit
-RELIANCE.NS,Enhanced Donchian (Regime Filtered + Pattern Exit),0.1599,0.0058,0.8243,55,✅ Enabled,✅ Enabled
+RELIANCE.NS,Enhanced Donchian (Regime Filtered + Pattern Exit),0.2515,0.0092,0.7944,55,✅ Enabled,✅ Enabled

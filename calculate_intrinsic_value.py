@@ -1,20 +1,33 @@
 """
 Intrinsic Value Calculator for Indian Stocks
 
-This script calculates the intrinsic value of stocks using multiple valuation methods:
+A comprehensive valuation model that calculates intrinsic value using multiple methods:
 1. Graham's Formula (Benjamin Graham)
 2. Discounted Cash Flow (DCF) - Simplified
 3. P/E Ratio Analysis
 4. Price-to-Book (P/B) Analysis
 5. PEG Ratio Analysis
 
+Plus comprehensive Implied EPS Analysis for market expectations
+
+Features:
+- Automatic data validation and correction (dividend yield, debt-to-equity)
+- Smart growth rate calculation from company data
+- Multiple cash flow fallbacks (FCF → OCF → EPS proxy)
+- Comprehensive implied EPS analysis
+- Production-ready with robust error handling
+
 Usage:
     python3 calculate_intrinsic_value.py TICKER.NS
     python3 calculate_intrinsic_value.py RELIANCE.NS TCS.NS INFY.NS
+
+Version: 1.0 (Production Ready)
 """
 
 import argparse
 import sys
+import os
+import json
 import pandas as pd
 import yfinance as yf
 from datetime import datetime
@@ -74,8 +87,9 @@ def fetch_fundamental_data(symbol):
             'free_cashflow': info.get('freeCashflow', None),
             'operating_cashflow': info.get('operatingCashflow', None),
             
-            # Dividends
-            'dividend_yield': info.get('dividendYield', None),
+                # Dividends
+            'dividend_yield_raw': info.get('dividendYield', None),
+            'dividend_rate': info.get('dividendRate', None),  # Annual dividend per share
             'payout_ratio': info.get('payoutRatio', None),
             
             # Market Metrics
@@ -103,6 +117,54 @@ def fetch_fundamental_data(symbol):
                 data['eps'] = None
         else:
             data['eps'] = None
+        
+        # Fix dividend yield calculation (handle Indian dividend declarations)
+        # Indian companies declare dividends as % of Face Value (₹10), not market price
+        # Validate and recalculate if needed
+        dividend_yield = data.get('dividend_yield_raw')
+        if dividend_yield is not None:
+            # Check if dividend yield is unreasonably high (>10% is suspicious)
+            if dividend_yield > 0.10:  # More than 10%
+                print(f"⚠️  Warning: Dividend yield seems high ({dividend_yield*100:.2f}%)")
+                print(f"   This might be a data error. Recalculating from dividend rate...")
+                
+                # Try to recalculate from dividend rate
+                if data.get('dividend_rate') and current_price > 0:
+                    dividend_yield = data['dividend_rate'] / current_price
+                    print(f"   Recalculated dividend yield: {dividend_yield*100:.2f}%")
+                else:
+                    # If still suspicious, cap it at reasonable level or set to None
+                    print(f"   Using capped value of 5% for safety")
+                    dividend_yield = min(dividend_yield, 0.05)
+        
+        data['dividend_yield'] = dividend_yield
+        
+        # Fix debt-to-equity ratio (handle percentage vs ratio)
+        # Some data sources provide debt-to-equity as percentage (e.g., 37.71) instead of ratio (0.3771)
+        # Normal debt-to-equity ratios are typically 0.0 to 3.0, rarely above 5.0
+        debt_to_equity = data.get('debt_to_equity')
+        if debt_to_equity is not None:
+            # If debt-to-equity > 10, it's likely a percentage that needs conversion
+            if debt_to_equity > 10:
+                original_value = debt_to_equity
+                debt_to_equity = debt_to_equity / 100
+                print(f"⚠️  Warning: Debt-to-Equity appears to be percentage ({original_value:.2f}%)")
+                print(f"   Converted to ratio: {debt_to_equity:.2f}")
+            # Also check for suspiciously high ratios (even after conversion)
+            elif debt_to_equity > 5.0:
+                print(f"⚠️  Warning: Very high Debt-to-Equity ratio ({debt_to_equity:.2f})")
+                print(f"   This may indicate high financial risk")
+        
+        data['debt_to_equity'] = debt_to_equity
+        
+        # Validate and fix other suspicious values
+        if data.get('trailing_pe') and data['trailing_pe'] < 0:
+            print(f"⚠️  Warning: Negative P/E ratio detected, setting to None")
+            data['trailing_pe'] = None
+        
+        if data.get('free_cashflow') and data['free_cashflow'] < 0:
+            print(f"⚠️  Warning: Negative Free Cash Flow detected")
+            print(f"   This may affect DCF valuation accuracy")
         
         print(f"✅ Data fetched successfully")
         return data
@@ -136,30 +198,69 @@ def calculate_graham_intrinsic_value(data):
         return None
 
 
-def calculate_dcf_intrinsic_value(data, growth_rate=0.10, terminal_growth=0.03, years=10):
+def calculate_dcf_intrinsic_value(data, growth_rate=None, terminal_growth=0.03, years=10):
     """
     Calculate intrinsic value using simplified DCF model.
     
     Args:
         data (dict): Fundamental data dictionary
-        growth_rate (float): Expected growth rate (default 10%)
+        growth_rate (float): Expected growth rate (auto-calculated if None)
         terminal_growth (float): Terminal growth rate (default 3%)
         years (int): Number of years to project
     
     Returns:
         float: Intrinsic value per share
     """
-    if not data.get('free_cashflow') or not data.get('shares_outstanding'):
+    # Try to get FCF first, fallback to operating cash flow or EPS-based proxy
+    fcf = data.get('free_cashflow')
+    operating_cf = data.get('operating_cashflow')
+    shares = data.get('shares_outstanding')
+    
+    if not shares:
+        return None
+    
+    # Use FCF if available and positive, otherwise try operating CF
+    if fcf and fcf > 0:
+        fcf_per_share = fcf / shares
+        cash_flow_type = "Free Cash Flow"
+    elif operating_cf and operating_cf > 0:
+        # Use operating cash flow as proxy (less ideal but better than nothing)
+        fcf_per_share = operating_cf / shares
+        cash_flow_type = "Operating Cash Flow (proxy)"
+        print(f"   ⚠️  Using Operating CF as FCF proxy (FCF unavailable)")
+    elif data.get('eps'):
+        # Last resort: Use EPS as cash flow proxy (assumes earnings = cash flow)
+        # This is not ideal but provides a rough estimate
+        fcf_per_share = data['eps'] * 0.8  # Assume 80% of earnings is cash
+        cash_flow_type = "EPS-based proxy (80% of earnings)"
+        print(f"   ⚠️  Using EPS-based cash flow proxy (FCF unavailable)")
+    else:
         return None
     
     try:
-        fcf = data['free_cashflow']
-        shares = data['shares_outstanding']
-        fcf_per_share = fcf / shares
+        # Auto-calculate growth rate if not provided
+        if growth_rate is None:
+            # Use revenue growth if available, otherwise earnings growth
+            if data.get('revenue_growth_5y') and data['revenue_growth_5y'] > 0:
+                growth_rate = min(data['revenue_growth_5y'], 0.20)  # Cap at 20%
+            elif data.get('earnings_growth_5y') and data['earnings_growth_5y'] > 0:
+                growth_rate = min(data['earnings_growth_5y'], 0.20)
+            elif data.get('revenue_growth') and data['revenue_growth'] > 0:
+                growth_rate = min(data['revenue_growth'], 0.15)  # Cap at 15% for quarterly
+            else:
+                growth_rate = 0.10  # Default 10%
+        
+        # Ensure growth rate is reasonable (0% to 20%)
+        growth_rate = max(0.0, min(growth_rate, 0.20))
         
         # Discount rate (WACC approximation)
         # Risk-free rate + market risk premium
         discount_rate = data.get('risk_free_rate', 0.07) + 0.05  # 12% total
+        
+        # For cyclical or high-risk stocks, adjust discount rate
+        if data.get('debt_to_equity') and data['debt_to_equity'] > 1.5:
+            discount_rate += 0.02  # Add 2% for high debt
+            print(f"   ⚠️  Adjusted discount rate for high debt: {discount_rate*100:.1f}%")
         
         # Project future cash flows
         pv_fcf = 0
@@ -173,8 +274,14 @@ def calculate_dcf_intrinsic_value(data, growth_rate=0.10, terminal_growth=0.03, 
         pv_terminal = terminal_value / ((1 + discount_rate) ** years)
         
         intrinsic_value = pv_fcf + pv_terminal
+        
+        # Add note about assumptions
+        if cash_flow_type != "Free Cash Flow":
+            print(f"   📝 DCF assumptions: {cash_flow_type}, Growth: {growth_rate*100:.1f}%, Discount: {discount_rate*100:.1f}%")
+        
         return intrinsic_value
     except Exception as e:
+        print(f"   ❌ DCF calculation error: {e}")
         return None
 
 
@@ -223,7 +330,10 @@ def calculate_pb_based_intrinsic_value(data, fair_pb=1.5):
 def calculate_peg_based_intrinsic_value(data):
     """
     Calculate intrinsic value using PEG ratio.
-    Fair PEG is typically 1.0
+    Fair PEG is typically 1.0, so Fair P/E = Growth Rate (as percentage)
+    
+    Formula: IV = EPS × (Growth Rate × 100)
+    Where Growth Rate is the earnings growth rate
     
     Args:
         data (dict): Fundamental data dictionary
@@ -231,21 +341,67 @@ def calculate_peg_based_intrinsic_value(data):
     Returns:
         float: Intrinsic value
     """
-    if not data.get('trailing_pe') or not data.get('earnings_growth_5y'):
+    if not data.get('eps'):
         return None
     
     try:
-        # If PEG is available, use it directly
-        if data.get('peg_ratio'):
-            # Fair P/E = Fair PEG (1.0) * Growth Rate
-            growth = data.get('earnings_growth_5y', 0.10)
-            if growth and growth > 0:
-                fair_pe = 1.0 * growth * 100  # Convert to percentage
-                if data.get('eps'):
-                    return data['eps'] * fair_pe
+        # Get growth rate - prefer 5-year earnings growth, fallback to revenue growth
+        growth_rate = None
+        
+        # Try 5-year earnings growth first
+        if data.get('earnings_growth_5y') and data['earnings_growth_5y'] > 0:
+            growth_rate = data['earnings_growth_5y']
+        # Fallback to 5-year revenue growth
+        elif data.get('revenue_growth_5y') and data['revenue_growth_5y'] > 0:
+            growth_rate = data['revenue_growth_5y']
+        # Fallback to quarterly earnings growth
+        elif data.get('earnings_growth') and data['earnings_growth'] > 0:
+            growth_rate = data['earnings_growth']
+        # Fallback to quarterly revenue growth
+        elif data.get('revenue_growth') and data['revenue_growth'] > 0:
+            growth_rate = data['revenue_growth']
+        
+        # If we have a growth rate, calculate fair P/E
+        if growth_rate and growth_rate > 0:
+            # Cap growth rate at 30% for reasonable P/E
+            growth_rate = min(growth_rate, 0.30)
+            # Fair P/E = Growth Rate × 100 (convert to percentage)
+            # For PEG = 1.0, P/E should equal growth rate percentage
+            fair_pe = growth_rate * 100
+            # Cap fair P/E at 30 for safety
+            fair_pe = min(fair_pe, 30)
+            intrinsic_value = data['eps'] * fair_pe
+            return intrinsic_value
+        
         return None
-    except:
+    except Exception as e:
         return None
+
+
+def calculate_implied_eps(data, pe_ratios=[10, 15, 20, 25, 30]):
+    """
+    Calculate Implied EPS - what EPS would justify the current market price
+    at different P/E ratios.
+    
+    Formula: Implied EPS = Current Price / P/E Ratio
+    
+    Args:
+        data (dict): Fundamental data dictionary
+        pe_ratios (list): List of P/E ratios to calculate implied EPS for
+    
+    Returns:
+        dict: Dictionary with P/E ratios as keys and implied EPS as values
+    """
+    current_price = data.get('current_price')
+    if not current_price or current_price <= 0:
+        return None
+    
+    implied_eps_dict = {}
+    for pe in pe_ratios:
+        implied_eps = current_price / pe
+        implied_eps_dict[pe] = implied_eps
+    
+    return implied_eps_dict
 
 
 def analyze_valuation(symbol):
@@ -354,6 +510,11 @@ def analyze_valuation(symbol):
     print(f"{assessment}")
     print(f"Recommendation: {recommendation}")
     
+    # Market expectations note
+    if discount_to_avg < -20:
+        print("\n💡 Note: Market may be pricing in future growth/margin expansion")
+        print("   Consider: Earnings growth trajectory, sector trends, competitive position")
+    
     # Key metrics
     print("\n" + "-"*80)
     print("📋 KEY METRICS")
@@ -367,24 +528,132 @@ def analyze_valuation(symbol):
     if data.get('peg_ratio'):
         print(f"PEG Ratio:                   {data['peg_ratio']:.2f} (Fair = 1.0)")
     if data.get('eps'):
-        print(f"EPS:                         ₹{data['eps']:.2f}")
+        print(f"Current EPS:                 ₹{data['eps']:.2f}")
     if data.get('book_value'):
         print(f"Book Value per Share:        ₹{data['book_value']:.2f}")
-    if data.get('dividend_yield'):
-        print(f"Dividend Yield:              {data['dividend_yield']*100:.2f}%")
+    if data.get('dividend_yield') is not None:
+        div_yield = data['dividend_yield']
+        if div_yield > 0.10:
+            print(f"Dividend Yield:              {div_yield*100:.2f}% ⚠️ (Please verify)")
+        else:
+            print(f"Dividend Yield:              {div_yield*100:.2f}%")
     if data.get('profit_margin'):
         print(f"Profit Margin:               {data['profit_margin']*100:.2f}%")
     if data.get('debt_to_equity'):
         print(f"Debt-to-Equity:              {data['debt_to_equity']:.2f}")
     
-    return {
+    # Implied EPS calculation
+    implied_eps = calculate_implied_eps(data)
+    if implied_eps:
+        print("\n" + "-"*80)
+        print("💡 IMPLIED EPS ANALYSIS")
+        print("-"*80)
+        print("What EPS would justify the current price at different P/E ratios?")
+        print(f"\n{'P/E Ratio':<15} {'Implied EPS':<20} {'vs Current EPS':<25} {'Gap':<15}")
+        print("-"*75)
+        
+        current_eps = data.get('eps')
+        for pe in sorted(implied_eps.keys()):
+            implied = implied_eps[pe]
+            if current_eps:
+                gap = implied - current_eps
+                gap_pct = (gap / current_eps) * 100 if current_eps > 0 else 0
+                vs_current = f"₹{current_eps:.2f}"
+                gap_str = f"{gap:+.2f} ({gap_pct:+.1f}%)"
+            else:
+                vs_current = "N/A"
+                gap_str = "N/A"
+            
+            # Highlight if implied EPS is close to current EPS
+            marker = ""
+            if current_eps and abs(implied - current_eps) / current_eps < 0.10:
+                marker = " ⭐"
+            
+            print(f"P/E {pe:<10} ₹{implied:<18.2f} {vs_current:<24} {gap_str:<14}{marker}")
+        
+        # Show what P/E the current EPS implies
+        if current_eps and current_eps > 0:
+            implied_pe = current_price / current_eps
+            print(f"\n📊 Current EPS (₹{current_eps:.2f}) implies P/E of {implied_pe:.2f}")
+            
+            # Compare to trailing P/E if available
+            if data.get('trailing_pe'):
+                diff = implied_pe - data['trailing_pe']
+                if abs(diff) > 0.1:
+                    print(f"   (Trailing P/E: {data['trailing_pe']:.2f}, Difference: {diff:+.2f})")
+        
+        # Interpretation
+        print("\n💭 Interpretation:")
+        if current_eps:
+            # Find closest P/E ratio
+            closest_pe = min(implied_eps.keys(), key=lambda x: abs(implied_eps[x] - current_eps))
+            if abs(implied_eps[closest_pe] - current_eps) / current_eps < 0.10:
+                print(f"   Market is pricing the stock at approximately P/E {closest_pe}")
+            else:
+                # Find what P/E would match current EPS
+                matching_pe = current_price / current_eps
+                if matching_pe < 10:
+                    print(f"   Market expects very high earnings growth (P/E {matching_pe:.1f})")
+                elif matching_pe > 30:
+                    print(f"   Market is pricing at premium P/E {matching_pe:.1f} (growth expectations)")
+                else:
+                    print(f"   Market is pricing at P/E {matching_pe:.1f}")
+        else:
+            print("   Use Implied EPS to understand market expectations")
+    
+    result_dict = {
         'symbol': symbol,
         'current_price': current_price,
         'average_intrinsic_value': avg_iv,
         'discount_premium_pct': discount_to_avg,
         'assessment': assessment,
-        'results': results
+        'results': results,
+        'timestamp': datetime.now().isoformat()
     }
+    
+    # Save to valuation directory
+    save_valuation_results(result_dict, symbol)
+    
+    return result_dict
+
+
+def get_valuation_dir(stock_symbol):
+    """Get valuation subdirectory for Benjamin Oreo results."""
+    base_dir = os.path.join("analysis_results", stock_symbol)
+    valuation_dir = os.path.join(base_dir, "valuation")
+    if not os.path.exists(valuation_dir):
+        os.makedirs(valuation_dir)
+    return valuation_dir
+
+
+def save_valuation_results(result_dict, stock_symbol):
+    """Save valuation results as JSON to valuation/ directory."""
+    try:
+        valuation_dir = get_valuation_dir(stock_symbol)
+        output_path = os.path.join(valuation_dir, "intrinsic_value.json")
+        
+        # Convert results to JSON-serializable format
+        json_dict = {
+            'symbol': result_dict['symbol'],
+            'current_price': float(result_dict['current_price']),
+            'average_intrinsic_value': float(result_dict['average_intrinsic_value']),
+            'discount_premium_pct': float(result_dict['discount_premium_pct']),
+            'assessment': result_dict['assessment'],
+            'timestamp': result_dict['timestamp'],
+            'valuation_methods': {}
+        }
+        
+        # Convert results dictionary to JSON-serializable format
+        for method, value in result_dict['results'].items():
+            if value is not None:
+                json_dict['valuation_methods'][method] = float(value)
+        
+        with open(output_path, 'w') as f:
+            json.dump(json_dict, f, indent=2)
+        
+        print(f"\n💾 Valuation results saved to: {output_path}")
+    except Exception as e:
+        print(f"⚠️  Could not save valuation results: {e}")
 
 
 def main():

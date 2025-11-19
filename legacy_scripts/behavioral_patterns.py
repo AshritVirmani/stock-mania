@@ -35,6 +35,14 @@ def get_ticker_output_dir(stock_symbol):
     return ticker_dir
 
 
+def get_analysis_dir(stock_symbol):
+    """Get analysis subdirectory for correlation, regimes, similarity."""
+    analysis_dir = os.path.join(get_ticker_output_dir(stock_symbol), "analysis")
+    if not os.path.exists(analysis_dir):
+        os.makedirs(analysis_dir)
+    return analysis_dir
+
+
 def load_analysis_data(file_path):
     """Loads and preprocesses stock analysis data."""
     if not os.path.exists(file_path):
@@ -186,9 +194,9 @@ def plot_regimes_over_time(df_full, df_clustered, stock_symbol):
     
     plt.tight_layout()
     
-    # Save the plot in ticker-specific directory
-    ticker_dir = get_ticker_output_dir(stock_symbol)
-    output_path = os.path.join(ticker_dir, "market_regimes_plot.png")
+    # Save the plot in analysis subdirectory
+    analysis_dir = get_analysis_dir(stock_symbol)
+    output_path = os.path.join(analysis_dir, "market_regimes_plot.png")
     fig.savefig(output_path, dpi=300)
     print(f"💾 Regime plot saved to {output_path}")
     plt.close(fig)
@@ -247,9 +255,9 @@ def main():
     # Plot the results
     plot_regimes_over_time(df_full, df_clustered, stock_symbol)
     
-    # Save the full dataset with regime labels in ticker-specific directory
-    ticker_dir = get_ticker_output_dir(stock_symbol)
-    output_path_csv = os.path.join(ticker_dir, "data_with_regimes.csv")
+    # Save the full dataset with regime labels in analysis subdirectory
+    analysis_dir = get_analysis_dir(stock_symbol)
+    output_path_csv = os.path.join(analysis_dir, "data_with_regimes.csv")
     df_full_with_regimes.to_csv(output_path_csv)
     print(f"\n💾 Full data with regime labels saved to {output_path_csv}")
     print(f"📁 All results saved in: {ticker_dir}/")

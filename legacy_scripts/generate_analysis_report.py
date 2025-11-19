@@ -35,6 +35,20 @@ def get_ticker_analysis_dir(stock_symbol):
     return ticker_dir
 
 
+def get_analysis_dir(stock_symbol):
+    """Get analysis subdirectory for correlation, regimes, similarity."""
+    analysis_dir = os.path.join(get_ticker_analysis_dir(stock_symbol), "analysis")
+    return analysis_dir
+
+
+def get_reports_dir(stock_symbol):
+    """Get reports subdirectory for final reports."""
+    reports_dir = os.path.join(get_ticker_analysis_dir(stock_symbol), "reports")
+    if not os.path.exists(reports_dir):
+        os.makedirs(reports_dir)
+    return reports_dir
+
+
 def get_image_as_base64(path):
     """Encodes an image file into a base64 string for embedding in HTML."""
     if not os.path.exists(path):
@@ -58,34 +72,46 @@ def generate_report(stock_symbol):
     print("Step 1: Loading analysis data...")
     
     ticker_dir = get_ticker_analysis_dir(stock_symbol)
+    analysis_dir = get_analysis_dir(stock_symbol)
     
-    # Correlation data
-    corr_matrix_path = os.path.join(ticker_dir, "correlation_matrix.csv")
+    # Correlation data (try new path first, fallback to old)
+    corr_matrix_path = os.path.join(analysis_dir, "correlation_matrix.csv")
+    if not os.path.exists(corr_matrix_path):
+        corr_matrix_path = os.path.join(ticker_dir, "correlation_matrix.csv")
     corr_matrix = pd.read_csv(corr_matrix_path, index_col=0) if os.path.exists(corr_matrix_path) else None
     
-    # Try new filename first, fallback to old for backward compatibility
-    corr_heatmap_path = os.path.join(ticker_dir, "correlation_heatmap_full.png")
+    # Correlation heatmap (try new path first, fallback to old)
+    corr_heatmap_path = os.path.join(analysis_dir, "correlation_heatmap.png")
     if not os.path.exists(corr_heatmap_path):
-        corr_heatmap_path = os.path.join(ticker_dir, "correlation_heatmap.png")
+        corr_heatmap_path = os.path.join(ticker_dir, "correlation_heatmap_full.png")
+        if not os.path.exists(corr_heatmap_path):
+            corr_heatmap_path = os.path.join(ticker_dir, "correlation_heatmap.png")
     corr_heatmap_b64 = get_image_as_base64(corr_heatmap_path)
     
-    # Behavioral/Regime data
-    regime_data_path = os.path.join(ticker_dir, "data_with_regimes.csv")
-    # Use index_col=0 because the date column is the first column and may be unnamed
+    # Behavioral/Regime data (try new path first, fallback to old)
+    regime_data_path = os.path.join(analysis_dir, "data_with_regimes.csv")
+    if not os.path.exists(regime_data_path):
+        regime_data_path = os.path.join(ticker_dir, "data_with_regimes.csv")
     regime_data = pd.read_csv(regime_data_path, index_col=0, parse_dates=True) if os.path.exists(regime_data_path) else None
     if regime_data is not None:
         regime_data.index.name = 'Date'
         
-    regime_plot_path = os.path.join(ticker_dir, "market_regimes_plot.png")
+    regime_plot_path = os.path.join(analysis_dir, "market_regimes_plot.png")
+    if not os.path.exists(regime_plot_path):
+        regime_plot_path = os.path.join(ticker_dir, "market_regimes_plot.png")
     regime_plot_b64 = get_image_as_base64(regime_plot_path)
 
     # Find the latest date to use for similarity analysis
     latest_date = regime_data.index.max().strftime('%Y-%m-%d') if regime_data is not None else None
     
-    # Similarity data - look for any similar_days file
+    # Similarity data - look for latest file (new path first, fallback to old)
     similar_days_df = None
-    if latest_date:
-        similar_days_path = os.path.join(ticker_dir, f"similar_days_{latest_date}.csv")
+    similar_days_path = os.path.join(analysis_dir, "similar_days_latest.csv")
+    if os.path.exists(similar_days_path):
+        similar_days_df = pd.read_csv(similar_days_path)
+    elif latest_date:
+        # Try old path with date suffix
+        similar_days_path = os.path.join(ticker_dir, f"similar_days_euclidean_{latest_date}.csv")
         if os.path.exists(similar_days_path):
             similar_days_df = pd.read_csv(similar_days_path)
         else:
@@ -163,7 +189,8 @@ def generate_report(stock_symbol):
 
     # --- 3. Save the HTML report ---
     print("Step 3: Saving the HTML report...")
-    output_path = os.path.join(ticker_dir, "comprehensive_report.html")
+    reports_dir = get_reports_dir(stock_symbol)
+    output_path = os.path.join(reports_dir, "comprehensive_report.html")
     with open(output_path, 'w') as f:
         f.write(html)
     

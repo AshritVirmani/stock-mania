@@ -1,12 +1,14 @@
 """
-Find Undervalued Stocks - Batch Analysis
+Benjamin Oreo - Find Undervalued Stocks (Batch Analysis)
 
-This script analyzes multiple stocks and identifies which ones are trading
-below their intrinsic value (undervalued stocks).
+This script uses the Benjamin Oreo valuation model to analyze multiple stocks
+and identify which ones are trading below their intrinsic value.
 
 Usage:
     python3 find_undervalued_stocks.py RELIANCE.NS TCS.NS INFY.NS
     python3 find_undervalued_stocks.py --min-discount 10
+
+Powered by: Benjamin Oreo Valuation Model v1.0 (Production Ready)
 """
 
 import argparse
@@ -26,6 +28,8 @@ def find_undervalued_stocks(stocks, min_discount=10):
         list: List of undervalued stocks with their details
     """
     print("\n" + "="*80)
+    print("🍪 BENJAMIN OREO - PRODUCTION-READY VALUATION MODEL v1.0")
+    print("="*80)
     print(f"🔍 SCREENING {len(stocks)} STOCKS FOR UNDERVALUED OPPORTUNITIES")
     print("="*80)
     print(f"Minimum discount threshold: {min_discount}%")
@@ -90,10 +94,9 @@ def find_undervalued_stocks(stocks, min_discount=10):
         print("💡 NEXT STEPS")
         print("="*80)
         print("For each undervalued stock, consider:")
-        print("  1. Run technical analysis: python3 analyze_indian_stocks.py <TICKER>")
-        print("  2. Check backtest results: python3 complete_setup.py <TICKER>")
-        print("  3. Review financial health and fundamentals")
-        print("  4. Consider your risk tolerance and investment goals")
+        print("  1. Run technical analysis: python3 analyze_stock.py <TICKER>")
+        print("  2. Review financial health and fundamentals")
+        print("  3. Consider your risk tolerance and investment goals")
     else:
         print(f"\n⚠️  No stocks found with ≥{min_discount}% discount to intrinsic value")
         print("   Consider:")
@@ -107,7 +110,7 @@ def find_undervalued_stocks(stocks, min_discount=10):
 def main():
     """Main function."""
     parser = argparse.ArgumentParser(
-        description="Find undervalued stocks by comparing market price to intrinsic value",
+        description="Benjamin Oreo - Find Undervalued Stocks by comparing market price to intrinsic value",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

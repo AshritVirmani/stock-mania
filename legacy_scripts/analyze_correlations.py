@@ -31,6 +31,14 @@ def get_ticker_output_dir(stock_symbol):
     return ticker_dir
 
 
+def get_analysis_dir(stock_symbol):
+    """Get analysis subdirectory for correlation, regimes, similarity."""
+    analysis_dir = os.path.join(get_ticker_output_dir(stock_symbol), "analysis")
+    if not os.path.exists(analysis_dir):
+        os.makedirs(analysis_dir)
+    return analysis_dir
+
+
 def load_analysis_data(file_path, tail=None):
     """
     Loads stock analysis data from a CSV file.
@@ -126,62 +134,14 @@ def plot_correlation_heatmap(correlation_matrix, stock_symbol):
         print("⚠️ Cannot plot heatmap: Correlation matrix is empty.")
         return
         
-    ticker_dir = get_ticker_output_dir(stock_symbol)
+    analysis_dir = get_analysis_dir(stock_symbol)
     
-    # Create full heatmap with better formatting
-    print("Generating full correlation heatmap...")
-    plt.style.use('seaborn-v0_8-whitegrid')
-    
-    # Calculate optimal figure size based on number of indicators
-    n_indicators = len(correlation_matrix)
-    # Scale figure size based on the number of indicators, capped at 30
-    fig_size = max(16, min(30, n_indicators * 0.3 + 10))
-    
-    fig, ax = plt.subplots(figsize=(fig_size, fig_size))
-    
-    # Create heatmap with better settings
-    sns.heatmap(
-        correlation_matrix,
-        annot=False,  # Don't annotate (too many cells)
-        cmap='RdBu_r',  # Red-Blue reversed (red=positive, blue=negative)
-        center=0,  # Center colormap at 0
-        vmin=-1, vmax=1,  # Full range
-        square=True,  # Square cells
-        cbar_kws={'label': 'Correlation Coefficient', 'shrink': 0.8},
-        ax=ax,
-        linewidths=0.1,  # Thin lines between cells
-        linecolor='gray'
-    )
-    
-    ax.set_title(
-        f'Correlation Matrix: {stock_symbol}\n({n_indicators} Technical Indicators)',
-        fontsize=16,
-        pad=15,
-        fontweight='bold'
-    )
-    
-    # Improve label formatting
-    ax.set_xlabel('Indicators', fontsize=12, fontweight='bold')
-    ax.set_ylabel('Indicators', fontsize=12, fontweight='bold')
-    
-    # Rotate labels and adjust font size
-    plt.setp(ax.get_xticklabels(), rotation=90, ha='right', fontsize=8)  # Increased font size slightly
-    plt.setp(ax.get_yticklabels(), rotation=0, fontsize=8)  # Increased font size slightly
-    
-    plt.tight_layout()
-    
-    # Save full heatmap
-    output_path = os.path.join(ticker_dir, "correlation_heatmap_full.png")  # Renamed filename for clarity
-    fig.savefig(output_path, dpi=200, bbox_inches='tight')
-    print(f"💾 Full heatmap saved to {output_path}")
-    plt.close(fig)
-    
-    # Create filtered heatmap showing only significant correlations
-    print("Generating filtered correlation heatmap (high correlations only)...")
-    create_filtered_heatmap(correlation_matrix, stock_symbol, ticker_dir)
+    # Create filtered heatmap showing only significant correlations (more useful than full)
+    print("Generating correlation heatmap (significant correlations only)...")
+    create_filtered_heatmap(correlation_matrix, stock_symbol, analysis_dir)
     
     # Also save correlation matrix CSV
-    csv_path = os.path.join(ticker_dir, "correlation_matrix.csv")
+    csv_path = os.path.join(analysis_dir, "correlation_matrix.csv")
     correlation_matrix.to_csv(csv_path)
     print(f"💾 Correlation matrix saved to {csv_path}")
 
@@ -235,9 +195,10 @@ def create_filtered_heatmap(correlation_matrix, stock_symbol, ticker_dir, thresh
     
     plt.tight_layout()
     
-    output_path = os.path.join(ticker_dir, f"correlation_heatmap_filtered_{threshold}.png")
+    # Save as correlation_heatmap.png (no threshold suffix, single file)
+    output_path = os.path.join(ticker_dir, "correlation_heatmap.png")
     fig.savefig(output_path, dpi=200, bbox_inches='tight')
-    print(f"💾 Filtered heatmap saved to {output_path}")
+    print(f"💾 Correlation heatmap saved to {output_path}")
     plt.close(fig)
 
 
