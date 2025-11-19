@@ -1,0 +1,2 @@
+Stock,Strategy,Total Log Return,Annualized Log Return,Average P-Value,Num Walk-Forward Periods,Regime Filtering,Pattern Exit
+POLYCAB.NS,Enhanced Donchian (Regime Filtered + Pattern Exit),0.3618,0.0807,0.7251,9,✅ Enabled,✅ Enabled

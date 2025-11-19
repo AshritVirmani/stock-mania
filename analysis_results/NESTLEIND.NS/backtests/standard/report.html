@@ -1,0 +1,50 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Donchian MCPT Report: NESTLEIND.NS</title>
+        <style>
+            body { font-family: sans-serif; margin: 2em; }
+            h1, h2 { color: #333; }
+            .summary-table { border-collapse: collapse; width: 100%; }
+            .summary-table th, .summary-table td { border: 1px solid #ddd; padding: 8px; }
+            .summary-table th { background-color: #f2f2f2; text-align: left; }
+            img { max-width: 100%; height: auto; margin-top: 1em; }
+        </style>
+    </head>
+    <body>
+        <h1>Donchian Strategy Walk-Forward MCPT Report: NESTLEIND.NS</h1>
+        <h2>Summary</h2>
+        <table border="1" class="dataframe summary-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Stock</th>
+      <th>Total Log Return</th>
+      <th>Annualized Log Return</th>
+      <th>Average P-Value</th>
+      <th>Num Walk-Forward Periods</th>
+      <th>Train Period Days</th>
+      <th>Test Period Days</th>
+      <th>MCPT Iterations</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>NESTLEIND.NS</td>
+      <td>0.005784</td>
+      <td>0.000375</td>
+      <td>0.690903</td>
+      <td>31</td>
+      <td>730</td>
+      <td>182</td>
+      <td>1000</td>
+    </tr>
+  </tbody>
+</table>
+        <h2>Walk-Forward Performance</h2>
+        <img src="equity_curve.png" alt="Equity Curve">
+        <p><em>This chart shows the cumulative log returns over time for the Donchian strategy.</em></p>
+    </body>
+    </html>
+    

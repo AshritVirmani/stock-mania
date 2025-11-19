@@ -1,0 +1,14 @@
+{
+  "symbol": "NESTLEIND.NS",
+  "current_price": 1279.0,
+  "average_intrinsic_value": 133.8185327774943,
+  "discount_premium_pct": -89.53725310574713,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-20T01:46:54.690866",
+  "valuation_methods": {
+    "Graham Formula": 89.00307344849065,
+    "DCF Model": 182.12705814628336,
+    "P/E Based (Fair P/E=15)": 229.64999951520326,
+    "P/B Based (Fair P/B=1.5)": 34.494
+  }
+}

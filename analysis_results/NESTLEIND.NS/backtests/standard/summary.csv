@@ -1,0 +1,2 @@
+Stock,Total Log Return,Annualized Log Return,Average P-Value,Num Walk-Forward Periods,Train Period Days,Test Period Days,MCPT Iterations
+NESTLEIND.NS,0.0057843620630322334,0.00037453257286341487,0.6909032258064517,31,730,182,1000

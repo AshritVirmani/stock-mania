@@ -1,0 +1,2 @@
+Stock,Total Log Return,Annualized Log Return,Average P-Value,Num Walk-Forward Periods,Train Period Days,Test Period Days,MCPT Iterations
+POLYCAB.NS,0.1796092998029435,0.04007470785157306,0.7864444444444444,9,730,182,1000

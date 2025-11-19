@@ -1,0 +1,15 @@
+{
+  "symbol": "BHEL.NS",
+  "current_price": 289.20001220703125,
+  "average_intrinsic_value": 73.7102897515989,
+  "discount_premium_pct": -74.51234901787227,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-20T02:07:58.264193",
+  "valuation_methods": {
+    "Graham Formula": 50.146747669217895,
+    "DCF Model": 141.41670103755578,
+    "P/E Based (Fair P/E=15)": 23.850000017073633,
+    "P/B Based (Fair P/B=1.5)": 105.438,
+    "PEG Based": 47.700000034147266
+  }
+}

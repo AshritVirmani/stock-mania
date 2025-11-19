@@ -1,0 +1,2 @@
+Stock,Total Log Return,Annualized Log Return,Average P-Value,Num Walk-Forward Periods,Train Period Days,Test Period Days,MCPT Iterations
+BHEL.NS,2.1639777504891975,0.0789682159422699,0.6648545454545454,55,730,182,1000

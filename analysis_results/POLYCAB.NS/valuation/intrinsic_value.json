@@ -1,0 +1,15 @@
+{
+  "symbol": "POLYCAB.NS",
+  "current_price": 7688.0,
+  "average_intrinsic_value": 2279.9721290178886,
+  "discount_premium_pct": -70.3437548254697,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-20T02:00:34.875872",
+  "valuation_methods": {
+    "Graham Formula": 1607.4505277469273,
+    "DCF Model": 1393.667605991022,
+    "P/E Based (Fair P/E=15)": 2447.699837117165,
+    "P/B Based (Fair P/B=1.5)": 1055.643,
+    "PEG Based": 4895.39967423433
+  }
+}

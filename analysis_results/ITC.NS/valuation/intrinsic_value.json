@@ -1,0 +1,15 @@
+{
+  "symbol": "ITC.NS",
+  "current_price": 403.54998779296875,
+  "average_intrinsic_value": 125.71797973097264,
+  "discount_premium_pct": -68.8469871059768,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-20T02:03:59.957816",
+  "valuation_methods": {
+    "Graham Formula": 143.36969586781314,
+    "DCF Model": 118.2347045943819,
+    "P/E Based (Fair P/E=15)": 241.64999845085833,
+    "P/B Based (Fair P/B=1.5)": 85.0605,
+    "PEG Based": 40.27499974180972
+  }
+}

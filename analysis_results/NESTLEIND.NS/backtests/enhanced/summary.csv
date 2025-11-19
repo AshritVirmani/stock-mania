@@ -1,0 +1,2 @@
+Stock,Strategy,Total Log Return,Annualized Log Return,Average P-Value,Num Walk-Forward Periods,Regime Filtering,Pattern Exit
+NESTLEIND.NS,Enhanced Donchian (Regime Filtered + Pattern Exit),-0.1009,-0.0065,0.7808,31,✅ Enabled,✅ Enabled

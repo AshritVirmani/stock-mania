@@ -1,0 +1,81 @@
+
+================================================================================
+💰 INTRINSIC VALUE ANALYSIS: BHEL.NS
+================================================================================
+
+📊 Fetching fundamental data for BHEL.NS...
+⚠️  Warning: Dividend yield seems high (17.00%)
+   This might be a data error. Recalculating from dividend rate...
+   Recalculated dividend yield: 0.17%
+⚠️  Warning: Debt-to-Equity appears to be percentage (44.96%)
+   Converted to ratio: 0.45
+⚠️  Warning: Negative Free Cash Flow detected
+   This may affect DCF valuation accuracy
+✅ Data fetched successfully
+
+📈 Current Market Price: ₹289.20
+📋 Company: Bharat Heavy Electricals Limited
+🏢 Sector: Industrials
+🏭 Industry: Specialty Industrial Machinery
+
+--------------------------------------------------------------------------------
+🔍 CALCULATING INTRINSIC VALUE (Multiple Methods)
+--------------------------------------------------------------------------------
+1️⃣  Graham's Formula:        ₹50.15 (-82.7%)
+   ⚠️  Using Operating CF as FCF proxy (FCF unavailable)
+   📝 DCF assumptions: Operating Cash Flow (proxy), Growth: 14.1%, Discount: 12.0%
+2️⃣  DCF Model (10-year):      ₹141.42 (-51.1%)
+3️⃣  P/E Based (Fair P/E=15):   ₹23.85 (-91.8%)
+4️⃣  P/B Based (Fair P/B=1.5):  ₹105.44 (-63.5%)
+5️⃣  PEG Based:                ₹47.70 (-83.5%)
+
+--------------------------------------------------------------------------------
+📊 SUMMARY
+--------------------------------------------------------------------------------
+Average Intrinsic Value:     ₹73.71
+Current Market Price:        ₹289.20
+Discount/Premium:            -74.5%
+
+--------------------------------------------------------------------------------
+🎯 VALUATION ASSESSMENT
+--------------------------------------------------------------------------------
+🔴 SIGNIFICANTLY OVERVALUED
+Recommendation: Consider Selling
+
+💡 Note: Market may be pricing in future growth/margin expansion
+   Consider: Earnings growth trajectory, sector trends, competitive position
+
+--------------------------------------------------------------------------------
+📋 KEY METRICS
+--------------------------------------------------------------------------------
+Trailing P/E:                181.89
+Forward P/E:                 38.15
+Price-to-Book:               4.11
+Current EPS:                 ₹1.59
+Book Value per Share:        ₹70.29
+Dividend Yield:              0.17%
+Profit Margin:               1.91%
+Debt-to-Equity:              0.45
+
+--------------------------------------------------------------------------------
+💡 IMPLIED EPS ANALYSIS
+--------------------------------------------------------------------------------
+What EPS would justify the current price at different P/E ratios?
+
+P/E Ratio       Implied EPS          vs Current EPS            Gap            
+---------------------------------------------------------------------------
+P/E 10         ₹28.92              ₹1.59                    +27.33 (+1718.9%)
+P/E 15         ₹19.28              ₹1.59                    +17.69 (+1112.6%)
+P/E 20         ₹14.46              ₹1.59                    +12.87 (+809.4%)
+P/E 25         ₹11.57              ₹1.59                    +9.98 (+627.5%)
+P/E 30         ₹9.64               ₹1.59                    +8.05 (+506.3%)
+
+📊 Current EPS (₹1.59) implies P/E of 181.89
+
+💭 Interpretation:
+   Market is pricing at premium P/E 181.9 (growth expectations)
+
+💾 Valuation results saved to: analysis_results/BHEL.NS/valuation/intrinsic_value.json
+
+================================================================================
+

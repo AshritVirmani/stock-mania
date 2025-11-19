@@ -1,0 +1,2 @@
+Stock,Strategy,Total Log Return,Annualized Log Return,Average P-Value,Num Walk-Forward Periods,Regime Filtering,Pattern Exit
+WOCKPHARMA.NS,Enhanced Donchian (Regime Filtered + Pattern Exit),0.3500,0.0167,0.7710,42,✅ Enabled,✅ Enabled
