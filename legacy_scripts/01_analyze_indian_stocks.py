@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 import pandas as pd
 import ta
 import yfinance as yf
@@ -14,53 +15,42 @@ def fetch_stock_data(symbol, start_date=None):
     Fetches all available data from the stock's listing date if start_date is None.
 
     Args:
-        symbol (str): The stock symbol to fetch (e.g., 'RELIANCE.NS').
+        symbol (str): The stock symbol to fetch (e.g., 'RELIANCE.NS', 'AAPL').
         start_date (str, optional): The start date for the data in 'YYYY-MM-DD' format.
                                    If None, fetches all available historical data.
 
     Returns:
-        pandas.DataFrame: A DataFrame with the stock data, or None if fetching fails.
+        pandas.DataFrame: A DataFrame with the stock data, or empty DataFrame if fetching fails.
     """
     print(f"Fetching data for {symbol}...")
     try:
-        # Try to get listing date first
-        listing_date_str = None
-        try:
-            ticker = yf.Ticker(symbol)
-            info = ticker.info
-            if 'listDate' in info and info['listDate']:
-                listing_date_str = info['listDate']
-                print(f"  Stock listed on: {listing_date_str}")
-        except Exception as e:
-            print(f"  Could not fetch listing date: {e}")
+        # Optimization: Use specific start date or fallback to a safe distant past
+        # Removing ticker.info call to prevent rate limiting and speed up execution
+        # yfinance automatically truncates data to the earliest available date
+        start = start_date if start_date else "1990-01-01"
         
-        # If start_date is None, fetch all available historical data
-        # Use a very early date (1990) to ensure we get all data
-        if start_date is None:
-            print("  Fetching all available historical data from listing date...")
-            # Use 1990-01-01 as start to get maximum historical data
-            # yfinance will return data from the actual listing date
-            data = yf.download(symbol, start="1990-01-01", progress=False, auto_adjust=True)
-        else:
-            data = yf.download(symbol, start=start_date, progress=False, auto_adjust=True)
+        data = yf.download(symbol, start=start, progress=False, auto_adjust=True)
         
         if data.empty:
-            print(f"No data found for symbol {symbol}. It might be delisted or an invalid symbol.")
-            return None
+            print(f"❌ No data found for {symbol}.")
+            return pd.DataFrame()  # Return empty DF instead of None for type safety
         
-        print(f"  Fetched {len(data)} days of data")
-        print(f"  Date range: {data.index.min().date()} to {data.index.max().date()}")
+        # CRITICAL FIX: Handle yfinance MultiIndex (v0.2+ compatibility)
+        # Recent versions of yfinance return MultiIndex columns even for single tickers
+        if isinstance(data.columns, pd.MultiIndex):
+            data.columns = data.columns.get_level_values(0)
+        
+        print(f"  Fetched {len(data)} rows ({data.index.min().date()} to {data.index.max().date()})")
         
         # Warn if data seems limited
         if len(data) < 100:
             print(f"  ⚠️  Warning: Only {len(data)} days of data. Some indicators may not work properly.")
             print(f"     (Most indicators need at least 50-200 days of data)")
         
-        # yfinance column names are already in the correct format (Open, High, Low, Close, Volume)
         return data
     except Exception as e:
-        print(f"Error fetching data for {symbol}: {e}")
-        return None
+        print(f"❌ Error fetching {symbol}: {e}")
+        return pd.DataFrame()  # Return empty DF instead of None for type safety
 
 
 def analyze_stock(df):
@@ -74,7 +64,9 @@ def analyze_stock(df):
         pandas.DataFrame: DataFrame with all TA features added.
     """
     print("Applying technical analysis indicators...")
-    df = ta.utils.dropna(df)
+    # Let ta.add_all_ta_features handle the fillna logic
+    # Do not drop rows explicitly before analysis unless they are corrupted
+    # This prevents dropping current day data with missing volume/adjustment data
     df_ta = ta.add_all_ta_features(
         df, open="Open", high="High", low="Low", close="Close", volume="Volume", fillna=True
     )
@@ -145,15 +137,21 @@ def process_stock(symbol, start_date=None):
     Fetches, analyzes, and saves data for a single stock.
     
     Args:
-        symbol (str): Stock symbol (e.g., 'RELIANCE.NS')
+        symbol (str): Stock symbol (e.g., 'RELIANCE.NS', 'AAPL', 'MSFT')
         start_date (str, optional): Start date in 'YYYY-MM-DD' format. If None, fetches all available data.
     """
-    if not isinstance(symbol, str) or not symbol.endswith(".NS"):
-        print(f"Invalid symbol format: '{symbol}'. Please use '.NS' suffix for Indian stocks (e.g., 'RELIANCE.NS').")
-        return
-
+    # Removed hard check for .NS to allow US stocks and other exchanges
+    symbol = symbol.strip().upper()
+    
     data = fetch_stock_data(symbol, start_date=start_date)
-    if data is not None:
+    
+    # Check for empty instead of None
+    if not data.empty:
+        # Ensure we have enough data for moving averages
+        if len(data) < 50:
+            print(f"⚠️  Skipping analysis: Insufficient data ({len(data)} rows).")
+            return
+        
         analyzed_data = analyze_stock(data)
         save_to_csv(analyzed_data, symbol)
         print_summary(analyzed_data, symbol)
@@ -163,20 +161,22 @@ def main():
     """
     Main function to run the analysis.
     """
-    parser = argparse.ArgumentParser(description="Perform technical analysis on Indian stocks.")
-    parser.add_argument('stocks', nargs='*', help="One or more stock symbols (e.g., RELIANCE.NS TCS.NS).")
+    parser = argparse.ArgumentParser(description="Perform technical analysis on stocks.")
+    parser.add_argument('stocks', nargs='*', default=[], 
+                        help="One or more stock symbols (e.g., RELIANCE.NS TCS.NS AAPL MSFT).")
     parser.add_argument('--start-date', type=str, default=None,
                         help="Start date for data in 'YYYY-MM-DD' format. If not specified, fetches all available historical data from listing date.")
     args = parser.parse_args()
 
-    if args.stocks:
-        stocks_to_process = args.stocks
-    else:
+    # If no stocks provided, use defaults
+    if not args.stocks:
         # Default stocks if none are provided via command line
         default_stocks = ["RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS"]
         print("No stock symbols provided. Running analysis for default stocks:")
         print(", ".join(default_stocks))
         stocks_to_process = default_stocks
+    else:
+        stocks_to_process = args.stocks
     
     # Display data range info
     if args.start_date:
@@ -189,16 +189,18 @@ def main():
         process_stock(stock, start_date=args.start_date)
 
     # Interactive mode for user input after processing initial stocks
-    while True:
-        try:
-            user_input = input("Enter a stock symbol to analyze (or 'quit' to exit): ").strip()
-            if user_input.lower() == 'quit':
+    # Only enter interactive mode if stdin is a TTY (not when called from subprocess)
+    if sys.stdin.isatty():
+        while True:
+            try:
+                user_input = input("Enter a stock symbol to analyze (or 'quit' to exit): ").strip()
+                if user_input.lower() == 'quit':
+                    break
+                if user_input:
+                    process_stock(user_input, start_date=args.start_date)
+            except (KeyboardInterrupt, EOFError):
+                print("\nExiting.")
                 break
-            if user_input:
-                process_stock(user_input, start_date=args.start_date)
-        except (KeyboardInterrupt, EOFError):
-            print("\nExiting.")
-            break
 
 
 if __name__ == "__main__":

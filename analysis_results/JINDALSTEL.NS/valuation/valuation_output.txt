@@ -1,0 +1,81 @@
+
+================================================================================
+💰 INTRINSIC VALUE ANALYSIS: JINDALSTEL.NS
+================================================================================
+
+📊 Fetching fundamental data for JINDALSTEL.NS...
+⚠️  Warning: Dividend yield seems high (19.00%)
+   This might be a data error. Recalculating from dividend rate...
+   Recalculated dividend yield: 0.19%
+⚠️  Warning: Debt-to-Equity appears to be percentage (38.02%)
+   Converted to ratio: 0.38
+⚠️  Warning: Negative Free Cash Flow detected
+   This may affect DCF valuation accuracy
+✅ Data fetched successfully
+
+📈 Current Market Price: ₹1071.00
+📋 Company: Jindal Steel Limited
+🏢 Sector: Basic Materials
+🏭 Industry: Steel
+
+--------------------------------------------------------------------------------
+🔍 CALCULATING INTRINSIC VALUE (Multiple Methods)
+--------------------------------------------------------------------------------
+1️⃣  Graham's Formula:        ₹544.41 (-49.2%)
+   ⚠️  Using Operating CF as FCF proxy (FCF unavailable)
+   📝 DCF assumptions: Operating Cash Flow (proxy), Growth: 4.2%, Discount: 12.0%
+2️⃣  DCF Model (10-year):      ₹1225.44 (+14.4%)
+3️⃣  P/E Based (Fair P/E=15):   ₹404.70 (-62.2%)
+4️⃣  P/B Based (Fair P/B=1.5):  ₹732.35 (-31.6%)
+5️⃣  PEG Based:                ₹113.32 (-89.4%)
+
+--------------------------------------------------------------------------------
+📊 SUMMARY
+--------------------------------------------------------------------------------
+Average Intrinsic Value:     ₹604.04
+Current Market Price:        ₹1071.00
+Discount/Premium:            -43.6%
+
+--------------------------------------------------------------------------------
+🎯 VALUATION ASSESSMENT
+--------------------------------------------------------------------------------
+🔴 SIGNIFICANTLY OVERVALUED
+Recommendation: Consider Selling
+
+💡 Note: Market may be pricing in future growth/margin expansion
+   Consider: Earnings growth trajectory, sector trends, competitive position
+
+--------------------------------------------------------------------------------
+📋 KEY METRICS
+--------------------------------------------------------------------------------
+Trailing P/E:                39.70
+Forward P/E:                 52.68
+Price-to-Book:               2.19
+Current EPS:                 ₹26.98
+Book Value per Share:        ₹488.24
+Dividend Yield:              0.19%
+Profit Margin:               5.61%
+Debt-to-Equity:              0.38
+
+--------------------------------------------------------------------------------
+💡 IMPLIED EPS ANALYSIS
+--------------------------------------------------------------------------------
+What EPS would justify the current price at different P/E ratios?
+
+P/E Ratio       Implied EPS          vs Current EPS            Gap            
+---------------------------------------------------------------------------
+P/E 10         ₹107.10             ₹26.98                   +80.12 (+297.0%)
+P/E 15         ₹71.40              ₹26.98                   +44.42 (+164.6%)
+P/E 20         ₹53.55              ₹26.98                   +26.57 (+98.5%)
+P/E 25         ₹42.84              ₹26.98                   +15.86 (+58.8%)
+P/E 30         ₹35.70              ₹26.98                   +8.72 (+32.3%)
+
+📊 Current EPS (₹26.98) implies P/E of 39.70
+
+💭 Interpretation:
+   Market is pricing at premium P/E 39.7 (growth expectations)
+
+💾 Valuation results saved to: analysis_results/JINDALSTEL.NS/valuation/intrinsic_value.json
+
+================================================================================
+

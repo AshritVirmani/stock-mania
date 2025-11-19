@@ -1,0 +1,2 @@
+Stock,Strategy,Total Log Return,Annualized Return,Average P-Value,Num Walk-Forward Periods,Regime Filtering,Pattern Exit
+INDIGO.NS,Enhanced Donchian (Regime Filtered + Pattern Exit),-0.6105,-7.66%,0.6470,16,✅ Enabled,✅ Enabled

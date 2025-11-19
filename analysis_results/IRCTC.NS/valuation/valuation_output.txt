@@ -1,0 +1,84 @@
+
+================================================================================
+💰 INTRINSIC VALUE ANALYSIS: IRCTC.NS
+================================================================================
+
+📊 Fetching fundamental data for IRCTC.NS...
+   ⚠️  Using default Risk-Free Rate: 7.1% (could not fetch live data)
+⚠️  Warning: Dividend yield seems high (128.00%)
+   This might be a data error. Recalculating from dividend rate...
+   Recalculated dividend yield: 1.28%
+✅ Data fetched successfully
+
+📈 Current Market Price: ₹705.00
+📋 Company: Indian Railway Catering & Tourism Corporation Limited
+🏢 Sector: Industrials
+🏭 Industry: Railroads
+
+ℹ️  Using Sector Benchmarks: Fair P/E=20, Fair P/B=3.0
+
+--------------------------------------------------------------------------------
+🔍 CALCULATING INTRINSIC VALUE (Multiple Methods)
+--------------------------------------------------------------------------------
+1️⃣  Graham Formula:        ₹143.52 (-79.6%)
+   ⚠️  Adjusted discount rate for high debt: 14.1%
+2️⃣  DCF Model (10-year):      ₹127.49 (-81.9%)
+3️⃣  P/E Based (Fair P/E=20):   ₹343.40 (-51.3%)
+4️⃣  P/B Based (Fair P/B=3.0):  ₹159.96 (-77.3%)
+5️⃣  PEG Based:                ₹192.30 (-72.7%)
+
+--------------------------------------------------------------------------------
+📊 SUMMARY
+--------------------------------------------------------------------------------
+Average Intrinsic Value:     ₹193.33
+Current Market Price:        ₹705.00
+Discount/Premium:            -72.6%
+
+--------------------------------------------------------------------------------
+🎯 VALUATION ASSESSMENT
+--------------------------------------------------------------------------------
+🔴 SIGNIFICANTLY OVERVALUED
+Recommendation: Consider Selling
+
+💡 Note: Market may be pricing in future growth/margin expansion
+   Consider: Earnings growth trajectory, sector trends, competitive position
+
+--------------------------------------------------------------------------------
+📋 KEY METRICS
+--------------------------------------------------------------------------------
+Trailing P/E:                41.06
+Forward P/E:                 34.29
+Price-to-Book:               13.22
+Current EPS:                 ₹17.17
+Book Value per Share:        ₹53.32
+Dividend Yield:              1.28%
+Profit Margin:               28.59%
+Debt-to-Equity:              1.84
+
+--------------------------------------------------------------------------------
+💡 IMPLIED EPS ANALYSIS
+--------------------------------------------------------------------------------
+What EPS would justify the current price at different P/E ratios?
+
+P/E Ratio       Implied EPS          vs Current EPS            Gap            
+---------------------------------------------------------------------------
+P/E 10         ₹70.50              ₹17.17                   +53.33 (+310.6%)
+P/E 15         ₹47.00              ₹17.17                   +29.83 (+173.7%)
+P/E 20         ₹35.25              ₹17.17                   +18.08 (+105.3%)
+P/E 25         ₹28.20              ₹17.17                   +11.03 (+64.2%)
+P/E 30         ₹23.50              ₹17.17                   +6.33 (+36.9%)
+
+📊 Current EPS (₹17.17) implies P/E of 41.06
+
+💭 Interpretation:
+   Market is pricing at premium P/E 41.1 (growth expectations)
+
+💾 Valuation results saved to: analysis_results/IRCTC.NS/valuation/intrinsic_value.json
+
+================================================================================
+
+
+
+--- ERRORS/WARNINGS ---
+HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: ^IGSEC"}}}
+$^IGSEC: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")

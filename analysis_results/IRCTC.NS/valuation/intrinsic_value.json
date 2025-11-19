@@ -1,0 +1,15 @@
+{
+  "symbol": "IRCTC.NS",
+  "current_price": 705.0,
+  "average_intrinsic_value": 193.33414919048374,
+  "discount_premium_pct": -72.57671642688173,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-20T03:02:25.341036",
+  "valuation_methods": {
+    "Graham Formula": 143.5216424381346,
+    "DCF Model (10-year)": 127.4881250184295,
+    "P/E Based (Fair P/E=20)": 343.39998621529134,
+    "P/B Based (Fair P/B=3.0)": 159.957,
+    "PEG Based": 192.30399228056316
+  }
+}

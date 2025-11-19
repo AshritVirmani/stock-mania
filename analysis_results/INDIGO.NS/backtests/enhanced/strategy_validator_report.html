@@ -1,0 +1,135 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Strategy Validator Report: INDIGO.NS</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0 auto; max-width: 1200px; padding: 20px; background-color: #f9f9f9; }
+            h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+            h2 { color: #34495e; margin-top: 30px; }
+            .container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+            .summary-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+            .summary-table th, .summary-table td { border: 1px solid #e0e0e0; padding: 12px; text-align: left; }
+            .summary-table th { background-color: #f2f6fc; font-weight: 600; color: #2c3e50; }
+            .comparison-table { border-collapse: collapse; width: 100%; font-size: 14px; margin-top: 20px; }
+            .comparison-table th, .comparison-table td { border: 1px solid #e0e0e0; padding: 12px; text-align: center; }
+            .comparison-table th { background-color: #e8f4f8; font-weight: 600; }
+            .plot-container { text-align: center; margin: 20px 0; }
+            img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; }
+            .caption { font-style: italic; color: #666; margin-top: 8px; }
+            .metric-box { background-color: #e8f4f8; border-left: 4px solid #3498db; padding: 15px; margin: 10px 0; }
+            .winner { background-color: #d4edda; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <h1>Strategy Validator Report: INDIGO.NS</h1>
+        
+        <div class="container">
+            <h2>Executive Summary</h2>
+            <table border="1" class="dataframe summary-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Stock</th>
+      <th>Strategy</th>
+      <th>Total Log Return</th>
+      <th>Annualized Return</th>
+      <th>Average P-Value</th>
+      <th>Num Walk-Forward Periods</th>
+      <th>Regime Filtering</th>
+      <th>Pattern Exit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>INDIGO.NS</td>
+      <td>Enhanced Donchian (Regime Filtered + Pattern Exit)</td>
+      <td>-0.6105</td>
+      <td>-7.66%</td>
+      <td>0.6470</td>
+      <td>16</td>
+      <td>✅ Enabled</td>
+      <td>✅ Enabled</td>
+    </tr>
+  </tbody>
+</table>
+            <div class="metric-box">
+                <strong>Methodology:</strong> Walk-Forward Optimization (730 day train / 182 day test).
+                <br>
+                <strong>Validation:</strong> Monte Carlo Permutation Test (1000 iterations per period).
+                <br>
+                <strong>Transaction Costs:</strong> 10.0 bps per trade.
+            </div>
+        </div>
+        
+        <div class="container">
+            <h2>Strategy Comparison: Blind vs Regime-Aware</h2>
+            <table border="1" class="dataframe comparison-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Metric</th>
+      <th>Blind Trend Following</th>
+      <th>Regime-Aware Strategy</th>
+      <th>Value Added</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Total Return</td>
+      <td>-0.6123</td>
+      <td>-0.6105</td>
+      <td>0.0018</td>
+    </tr>
+    <tr>
+      <td>Annualized Return</td>
+      <td>-7.68%</td>
+      <td>-7.66%</td>
+      <td>0.02%</td>
+    </tr>
+    <tr>
+      <td>Sharpe Ratio</td>
+      <td>-2.07</td>
+      <td>-2.08</td>
+      <td>-0.02</td>
+    </tr>
+    <tr>
+      <td>Max Drawdown</td>
+      <td>-143.05%</td>
+      <td>-142.87%</td>
+      <td>0.18%</td>
+    </tr>
+    <tr>
+      <td>Volatility</td>
+      <td>466.86%</td>
+      <td>462.02%</td>
+      <td>-4.84%</td>
+    </tr>
+    <tr>
+      <td>Total Trades</td>
+      <td>108</td>
+      <td>118</td>
+      <td>10</td>
+    </tr>
+  </tbody>
+</table>
+            <div class="caption">This comparison proves whether regime filtering adds value or is just over-fitting.</div>
+        </div>
+        
+        <div class="container">
+            <h2>1. Strategy Comparison (The "Money Plot")</h2>
+            <div class="plot-container">
+                <img src="strategy_comparison.png" alt="Strategy Comparison">
+                <div class="caption">Green line = Regime-Aware Strategy. Gray line = Blind Trend Following. If Green beats Gray, regime filtering adds Alpha.</div>
+            </div>
+        </div>
+        
+        <div class="container">
+            <h2>2. Enhanced Strategy Equity Curve</h2>
+            <div class="plot-container">
+                <img src="equity_curve.png" alt="Equity Curve">
+                <div class="caption">Cumulative Log Returns over the entire test history.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+    

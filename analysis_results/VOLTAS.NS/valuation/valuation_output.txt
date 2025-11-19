@@ -1,0 +1,88 @@
+
+================================================================================
+💰 INTRINSIC VALUE ANALYSIS: VOLTAS.NS
+================================================================================
+
+📊 Fetching fundamental data for VOLTAS.NS...
+   ⚠️  Using default Risk-Free Rate: 7.1% (could not fetch live data)
+⚠️  Warning: Dividend yield seems high (51.00%)
+   This might be a data error. Recalculating from dividend rate...
+   Recalculated dividend yield: 0.50%
+⚠️  Warning: Debt-to-Equity appears to be percentage (27.45%)
+   Converted to ratio: 0.27
+⚠️  Warning: Negative Free Cash Flow detected
+   This may affect DCF valuation accuracy
+✅ Data fetched successfully
+
+📈 Current Market Price: ₹1401.80
+📋 Company: Voltas Limited
+🏢 Sector: Consumer Cyclical
+🏭 Industry: Furnishings, Fixtures & Appliances
+
+ℹ️  Using Sector Benchmarks: Fair P/E=20, Fair P/B=3.5
+
+--------------------------------------------------------------------------------
+🔍 CALCULATING INTRINSIC VALUE (Multiple Methods)
+--------------------------------------------------------------------------------
+1️⃣  Graham Formula:        ₹267.39 (-80.9%)
+   ⚠️  Using EPS-based cash flow proxy (FCF unavailable)
+   📝 DCF assumptions: EPS-based proxy (80% of earnings), Growth: 10.0%, Discount: 12.1%
+2️⃣  DCF Model (10-year):      ₹244.42 (-82.6%)
+3️⃣  P/E Based (Fair P/E=20):   ₹332.20 (-76.3%)
+4️⃣  P/B Based (Fair P/B=3.5):  ₹669.59 (-52.2%)
+
+--------------------------------------------------------------------------------
+📊 SUMMARY
+--------------------------------------------------------------------------------
+Average Intrinsic Value:     ₹378.40
+Current Market Price:        ₹1401.80
+Discount/Premium:            -73.0%
+
+--------------------------------------------------------------------------------
+🎯 VALUATION ASSESSMENT
+--------------------------------------------------------------------------------
+🔴 SIGNIFICANTLY OVERVALUED
+Recommendation: Consider Selling
+
+💡 Note: Market may be pricing in future growth/margin expansion
+   Consider: Earnings growth trajectory, sector trends, competitive position
+
+--------------------------------------------------------------------------------
+📋 KEY METRICS
+--------------------------------------------------------------------------------
+Trailing P/E:                84.39
+Forward P/E:                 41.41
+Price-to-Book:               7.33
+Current EPS:                 ₹16.61
+Book Value per Share:        ₹191.31
+Dividend Yield:              0.50%
+Profit Margin:               3.87%
+Debt-to-Equity:              0.27
+
+--------------------------------------------------------------------------------
+💡 IMPLIED EPS ANALYSIS
+--------------------------------------------------------------------------------
+What EPS would justify the current price at different P/E ratios?
+
+P/E Ratio       Implied EPS          vs Current EPS            Gap            
+---------------------------------------------------------------------------
+P/E 10         ₹140.18             ₹16.61                   +123.57 (+743.9%)
+P/E 15         ₹93.45              ₹16.61                   +76.84 (+462.6%)
+P/E 20         ₹70.09              ₹16.61                   +53.48 (+322.0%)
+P/E 25         ₹56.07              ₹16.61                   +39.46 (+237.6%)
+P/E 30         ₹46.73              ₹16.61                   +30.12 (+181.3%)
+
+📊 Current EPS (₹16.61) implies P/E of 84.39
+
+💭 Interpretation:
+   Market is pricing at premium P/E 84.4 (growth expectations)
+
+💾 Valuation results saved to: analysis_results/VOLTAS.NS/valuation/intrinsic_value.json
+
+================================================================================
+
+
+
+--- ERRORS/WARNINGS ---
+HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: ^IGSEC"}}}
+$^IGSEC: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")

@@ -3,13 +3,18 @@ Complete Setup for New Ticker
 
 This script runs the complete analysis workflow for a new stock ticker:
 1. Fetch data and calculate all 86 indicators
-2. Correlation analysis
-3. Behavioral pattern analysis (market regimes)
-4. Similarity analysis
-5. Standard Donchian MCPT backtest
-6. Enhanced Donchian MCPT backtest (with Red Light filtering + pattern exits)
-7. Drawdown analysis
-8. Comparison and summary
+2. Intrinsic value calculation
+3. Correlation analysis
+4. Behavioral pattern analysis (market regimes)
+5. Similarity analysis
+6. Standard Donchian MCPT backtest
+7. Enhanced Donchian MCPT backtest (with Red Light filtering + pattern exits)
+8. Drawdown analysis
+9. Strategy comparison & regime risk analysis
+10. Comprehensive report
+11. Whale calendar (macro + micro strategy)
+12. Professional whale chart (Bloomberg-style deep dive)
+13. Final dashboard (Alpha Deck - Portfolio Manager's Monitor)
 
 Usage:
     python3 complete_setup.py TICKER.NS
@@ -223,7 +228,7 @@ def run_complete_setup(stock_symbol):
             latest_date = df.index.max().strftime('%Y-%m-%d')
             print(f"📅 Analyzing similarity for latest date: {latest_date}")
             subprocess.run(
-                ['python3', os.path.join(SCRIPT_DIR, '06_find_similar_days.py'), latest_date, analysis_file],
+                ['python3', os.path.join(SCRIPT_DIR, '06_find_similar_days.py'), analysis_file, '--date', latest_date],
                 check=True,
                 capture_output=True,
                 cwd=PROJECT_ROOT
@@ -317,9 +322,9 @@ def run_complete_setup(stock_symbol):
     except Exception as e:
         print(f"⚠️  Error checking data requirements: {e}")
     
-    # Step 9: Drawdown Analysis
+    # Step 8: Drawdown Analysis
     print("\n" + "="*80)
-    print("STEP 9: Drawdown Analysis")
+    print("STEP 8: Drawdown Analysis")
     print("="*80)
     backtests_standard_dir = get_backtests_dir(stock_symbol, "standard")
     walkforward_file = os.path.join(backtests_standard_dir, "results.csv")
@@ -331,28 +336,45 @@ def run_complete_setup(stock_symbol):
                 capture_output=False,
                 cwd=PROJECT_ROOT
             )
-        except Exception as e:
+            print("✅ Drawdown analysis complete")
+        except subprocess.CalledProcessError as e:
             print(f"⚠️  Drawdown analysis failed: {e}")
+        except Exception as e:
+            print(f"⚠️  Drawdown analysis error: {e}")
     else:
         print("⚠️  Required files not found. Skipping drawdown analysis.")
+        if not os.path.exists(walkforward_file):
+            print(f"   Missing: {walkforward_file}")
+        if not os.path.exists(regime_file):
+            print(f"   Missing: {regime_file}")
     
-    # Step 9: Comparison
+    # Step 9: Strategy Comparison & Regime Risk Analysis
     print("\n" + "="*80)
-    print("STEP 9: Strategy Comparison")
+    print("STEP 9: Strategy Comparison & Regime Risk Analysis")
     print("="*80)
+    print("📊 Comparing strategies and performing Bayesian regime risk analysis...")
+    print("   (This includes probabilistic regime audit and filtering simulation)")
     try:
-        subprocess.run(
+        result = subprocess.run(
             ['python3', os.path.join(SCRIPT_DIR, '10_compare_backtests.py'), stock_symbol],
             check=True,
             capture_output=False,
             cwd=PROJECT_ROOT
         )
+        print("✅ Strategy comparison and regime risk analysis complete")
+        print("   - Standard vs Enhanced strategy comparison")
+        print("   - Bayesian regime risk analysis (if regime data available)")
+        print("   - Filter impact equity curve generated")
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️  Strategy comparison failed: {e}")
+        print("   → This step can run independently later if needed")
     except Exception as e:
-        print(f"⚠️  Comparison failed: {e}")
+        print(f"⚠️  Strategy comparison error: {e}")
+        print("   → This step can run independently later if needed")
     
-    # Step 11: Generate Comprehensive Report
+    # Step 10: Generate Comprehensive Report
     print("\n" + "="*80)
-    print("STEP 11: Generating Comprehensive Report")
+    print("STEP 10: Generating Comprehensive Report")
     print("="*80)
     try:
         subprocess.run(
@@ -364,6 +386,80 @@ def run_complete_setup(stock_symbol):
         print("✅ Comprehensive report generated")
     except subprocess.CalledProcessError as e:
         print(f"⚠️  Report generation failed: {e}")
+    
+    # Step 11: Generate Whale Calendar
+    print("\n" + "="*80)
+    print("STEP 11: Generating Whale Calendar (Macro + Micro Strategy)")
+    print("="*80)
+    print("📅 Generating complete strategy calendar with regime filtering...")
+    print("   - Whale signals (volume, spread, CLV analysis)")
+    print("   - Regime-aware filtering (Regime 3 = blocked, Regime 1 = high conviction)")
+    try:
+        result = subprocess.run(
+            ['python3', os.path.join(SCRIPT_DIR, '12_whale_calendar.py'), analysis_file],
+            check=True,
+            capture_output=False,
+            cwd=PROJECT_ROOT
+        )
+        print("✅ Whale calendar generated")
+        print("   - Combines whale buy signals with regime data")
+        print("   - Regime 3 (Crash) signals are blocked (⛔)")
+        print("   - Regime 1 (Rally) signals get gold star (⭐)")
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️  Whale calendar generation failed: {e}")
+        print("   → This step can run independently later if needed")
+    except Exception as e:
+        print(f"⚠️  Whale calendar error: {e}")
+        print("   → This step can run independently later if needed")
+    
+    # Step 12: Generate Professional Whale Chart
+    print("\n" + "="*80)
+    print("STEP 12: Generating Professional Whale Chart (Bloomberg-Style)")
+    print("="*80)
+    print("📊 Generating Bloomberg-style candlestick chart with whale signals...")
+    print("   - Professional candlestick visualization")
+    print("   - Whale signals overlaid on price action")
+    try:
+        result = subprocess.run(
+            ['python3', os.path.join(SCRIPT_DIR, '14_whale_hunter_pro.py'), analysis_file],
+            check=True,
+            capture_output=False,
+            cwd=PROJECT_ROOT
+        )
+        print("✅ Professional whale chart generated")
+        print("   - Bloomberg-style candlestick chart")
+        print("   - Whale signals (Ignition, Stealth, Trap) overlaid")
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️  Professional whale chart generation failed: {e}")
+        print("   → This step can run independently later if needed")
+        print("   → Note: Requires mplfinance library (pip install mplfinance)")
+    except Exception as e:
+        print(f"⚠️  Professional whale chart error: {e}")
+        print("   → This step can run independently later if needed")
+    
+    # Step 13: Generate Final Dashboard (Alpha Deck)
+    print("\n" + "="*80)
+    print("STEP 13: Generating Final Dashboard (Alpha Deck)")
+    print("="*80)
+    print("🏛️  Assembling Portfolio Manager's Monitor...")
+    print("   - Unified dashboard combining all analyses")
+    print("   - Strategy validation, whale signals, regimes, forecasts")
+    try:
+        result = subprocess.run(
+            ['python3', os.path.join(SCRIPT_DIR, '13_generate_final_dashboard.py'), stock_symbol],
+            check=True,
+            capture_output=False,
+            cwd=PROJECT_ROOT
+        )
+        print("✅ Final dashboard (Alpha Deck) generated")
+        print("   - Portfolio Manager's unified view")
+        print("   - All PhD-grade artifacts in one place")
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️  Final dashboard generation failed: {e}")
+        print("   → This step can run independently later if needed")
+    except Exception as e:
+        print(f"⚠️  Final dashboard error: {e}")
+        print("   → This step can run independently later if needed")
     
     # Final Summary
     print("\n" + "="*80)
@@ -381,8 +477,12 @@ def run_complete_setup(stock_symbol):
     print(f"   ✅ Regime data: analysis/data_with_regimes.csv")
     print(f"   ✅ Standard Donchian: backtests/standard/results.csv")
     print(f"   ✅ Enhanced Donchian: backtests/enhanced/results.csv")
-    print(f"   ✅ Comprehensive report: reports/comprehensive_report.html")
     print(f"   ✅ Strategy comparison: reports/backtest_comparison.csv")
+    print(f"   ✅ Filter impact curve: reports/filter_impact_equity_curve.png")
+    print(f"   ✅ Comprehensive report: reports/comprehensive_report.html")
+    print(f"   ✅ Whale calendar: analysis/complete_whale_calendar.html")
+    print(f"   ✅ Professional whale chart: analysis/whale_entry_map_pro.png")
+    print(f"   ✅ Alpha Deck dashboard: {stock_symbol}_Alpha_Deck.html")
     
     print("\n💡 Quick Commands:")
     print(f"   # View simple summary:")
@@ -411,8 +511,11 @@ def main():
         print("  6. Standard Donchian MCPT backtest")
         print("  7. Enhanced Donchian MCPT backtest")
         print("  8. Drawdown analysis")
-        print("  9. Strategy comparison")
+        print("  9. Strategy comparison & regime risk analysis")
         print("  10. Comprehensive report")
+        print("  11. Whale calendar (macro + micro strategy)")
+        print("  12. Professional whale chart (Bloomberg-style)")
+        print("  13. Final dashboard (Alpha Deck)")
         return
     
     stock_symbol = sys.argv[1].strip().upper()

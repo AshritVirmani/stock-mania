@@ -1,0 +1,86 @@
+
+================================================================================
+💰 INTRINSIC VALUE ANALYSIS: INDIGO.NS
+================================================================================
+
+📊 Fetching fundamental data for INDIGO.NS...
+   ⚠️  Using default Risk-Free Rate: 7.1% (could not fetch live data)
+⚠️  Warning: Dividend yield seems high (17.00%)
+   This might be a data error. Recalculating from dividend rate...
+   Recalculated dividend yield: 0.17%
+⚠️  Warning: Debt-to-Equity appears to be percentage (866.46%)
+   Converted to ratio: 8.66
+✅ Data fetched successfully
+
+📈 Current Market Price: ₹5758.50
+📋 Company: InterGlobe Aviation Limited
+🏢 Sector: Industrials
+🏭 Industry: Airlines
+
+ℹ️  Using Sector Benchmarks: Fair P/E=20, Fair P/B=3.0
+
+--------------------------------------------------------------------------------
+🔍 CALCULATING INTRINSIC VALUE (Multiple Methods)
+--------------------------------------------------------------------------------
+1️⃣  Graham Formula:        ₹814.52 (-85.9%)
+   ⚠️  Adjusted discount rate for high debt: 14.1%
+2️⃣  DCF Model (10-year):      ₹5706.45 (-0.9%)
+3️⃣  P/E Based (Fair P/E=20):   ₹2640.20 (-54.2%)
+4️⃣  P/B Based (Fair P/B=3.0):  ₹670.09 (-88.4%)
+5️⃣  PEG Based:                ₹1227.69 (-78.7%)
+
+--------------------------------------------------------------------------------
+📊 SUMMARY
+--------------------------------------------------------------------------------
+Average Intrinsic Value:     ₹2211.79
+Current Market Price:        ₹5758.50
+Discount/Premium:            -61.6%
+
+--------------------------------------------------------------------------------
+🎯 VALUATION ASSESSMENT
+--------------------------------------------------------------------------------
+🔴 SIGNIFICANTLY OVERVALUED
+Recommendation: Consider Selling
+
+💡 Note: Market may be pricing in future growth/margin expansion
+   Consider: Earnings growth trajectory, sector trends, competitive position
+
+--------------------------------------------------------------------------------
+📋 KEY METRICS
+--------------------------------------------------------------------------------
+Trailing P/E:                43.62
+Forward P/E:                 28.03
+Price-to-Book:               25.78
+Current EPS:                 ₹132.01
+Book Value per Share:        ₹223.36
+Dividend Yield:              0.17%
+Profit Margin:               6.13%
+Debt-to-Equity:              8.66
+
+--------------------------------------------------------------------------------
+💡 IMPLIED EPS ANALYSIS
+--------------------------------------------------------------------------------
+What EPS would justify the current price at different P/E ratios?
+
+P/E Ratio       Implied EPS          vs Current EPS            Gap            
+---------------------------------------------------------------------------
+P/E 10         ₹575.85             ₹132.01                  +443.84 (+336.2%)
+P/E 15         ₹383.90             ₹132.01                  +251.89 (+190.8%)
+P/E 20         ₹287.93             ₹132.01                  +155.92 (+118.1%)
+P/E 25         ₹230.34             ₹132.01                  +98.33 (+74.5%)
+P/E 30         ₹191.95             ₹132.01                  +59.94 (+45.4%)
+
+📊 Current EPS (₹132.01) implies P/E of 43.62
+
+💭 Interpretation:
+   Market is pricing at premium P/E 43.6 (growth expectations)
+
+💾 Valuation results saved to: analysis_results/INDIGO.NS/valuation/intrinsic_value.json
+
+================================================================================
+
+
+
+--- ERRORS/WARNINGS ---
+HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: ^IGSEC"}}}
+$^IGSEC: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")

@@ -10,9 +10,9 @@ from jinja2 import Environment, FileSystemLoader
 # --- Configuration ---
 BASE_OUTPUT_DIR = "analysis_results"
 DEFAULT_STOCK_FILE = "output/RELIANCE.NS_analysis.csv"
-TRAIN_PERIOD_DAYS = 365 * 2 # 2 years for training
-TEST_PERIOD_DAYS = 365 // 2 # 6 months for testing
-MCPT_ITERATIONS = 1000 # Number of Monte Carlo iterations
+TRAIN_PERIOD_DAYS = 365 * 2  # 2 years for training
+TEST_PERIOD_DAYS = 365 // 2  # 6 months for testing
+MCPT_ITERATIONS = 1000       # Number of Monte Carlo iterations (Higher = More Precision)
 
 def get_ticker_output_dir(stock_symbol):
     """Creates and returns the output directory for a given stock ticker."""
@@ -30,38 +30,46 @@ def get_backtests_dir(stock_symbol, strategy="standard"):
     return backtests_dir
 
 def plot_equity_curve(results_df, output_path):
-    """Plots the cumulative log returns over time."""
+    """
+    Plots the cumulative log returns over time.
+    This represents the growth of $1 invested in the strategy (log scale).
+    """
     plt.style.use('seaborn-v0_8-whitegrid')
     fig, ax = plt.subplots(figsize=(14, 7))
     
+    # Ensure data is sorted by time
+    results_df = results_df.sort_values('test_end')
     results_df['cumulative_returns'] = results_df['actual_returns'].cumsum()
     
     ax.plot(results_df['test_end'], results_df['cumulative_returns'], 
-            marker='o', linestyle='-', label='Donchian Strategy Equity Curve')
+            marker='o', linestyle='-', linewidth=2, color='#1f77b4', label='Strategy Equity (Log)')
     
-    ax.set_title('Walk-Forward Donchian Strategy Performance', fontsize=16)
-    ax.set_xlabel('Date', fontsize=12)
+    ax.set_title('Walk-Forward Donchian Strategy Performance', fontsize=16, fontweight='bold')
+    ax.set_xlabel('Test Period End Date', fontsize=12)
     ax.set_ylabel('Cumulative Log Returns', fontsize=12)
-    ax.legend()
-    ax.grid(True)
+    ax.legend(fontsize=12)
+    ax.grid(True, which='both', linestyle='--', linewidth=0.5)
     
     plt.tight_layout()
     fig.savefig(output_path, dpi=200)
     plt.close(fig)
 
 def plot_p_value_distribution(results_df, output_path):
-    """Plots the distribution of p-values from the MCPT."""
+    """
+    Plots the distribution of p-values from the MCPT.
+    A skew towards 0.0 indicates genuine edge. A flat distribution indicates randomness.
+    """
     plt.style.use('seaborn-v0_8-whitegrid')
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    sns.histplot(results_df['p_value'], bins=20, kde=True, ax=ax, color='skyblue')
+    sns.histplot(results_df['p_value'], bins=10, kde=True, ax=ax, color='skyblue', edgecolor='black')
     
-    ax.axvline(0.05, color='r', linestyle='--', label='p=0.05 (Significance Level)')
-    ax.axvline(0.10, color='orange', linestyle='--', label='p=0.10')
+    ax.axvline(0.05, color='r', linestyle='--', linewidth=2, label='Significance (p=0.05)')
+    ax.axvline(0.10, color='orange', linestyle='--', linewidth=2, label='Marginal (p=0.10)')
     
-    ax.set_title('Distribution of MCPT P-Values across Walk-Forward Periods', fontsize=14)
-    ax.set_xlabel('P-Value', fontsize=12)
-    ax.set_ylabel('Frequency', fontsize=12)
+    ax.set_title('Robustness Check: Distribution of P-Values', fontsize=16, fontweight='bold')
+    ax.set_xlabel('P-Value (Probability that Return is Luck)', fontsize=12)
+    ax.set_ylabel('Frequency (Number of Periods)', fontsize=12)
     ax.legend()
     
     plt.tight_layout()
@@ -70,127 +78,149 @@ def plot_p_value_distribution(results_df, output_path):
 
 def plot_actual_vs_permuted(results_df, output_path):
     """
-    Creates a visualization similar to the YouTube graph showing:
-    - Red line: Actual strategy cumulative returns
-    - Grey lines: Permuted strategy cumulative returns distribution
+    The 'Money Shot' Chart:
+    - Red line: Actual strategy cumulative returns (Real Optimized)
+    - Grey cloud: 100 random paths constructed from the permuted null distributions.
     
-    Note: Each period has independent permutations, so we create random paths
-    by randomly sampling from each period's permuted returns distribution.
+    Interpretation: If the Red line is above the Grey cloud, the strategy has significant Alpha.
+    If it's inside the cloud, the strategy is indistinguishable from luck.
     """
     plt.style.use('seaborn-v0_8-whitegrid')
     fig, ax = plt.subplots(figsize=(14, 8), facecolor='white')
-    ax.set_facecolor('white')
     
-    # Calculate cumulative returns over time
+    # Sort and calculate actual cumulative
     results_df = results_df.sort_values('test_end').copy()
     results_df['cumulative_actual'] = results_df['actual_returns'].cumsum()
     
-    # Plot actual strategy (red line - like "Real Optimized")
-    ax.plot(results_df['test_end'], results_df['cumulative_actual'], 
-            color='red', linewidth=2.5, label='Real Optimized Strategy', zorder=10)
-    
-    # Plot permuted strategies (grey lines - like "Permutation Optimized")
-    # Each period has independent permutations, so we create random paths
-    # by randomly sampling one permuted return from each period
+    # --- Plot Permuted "Null Hypothesis" Paths ---
+    # We simulate 100 possible "luck" outcomes by sampling one permuted return 
+    # from each period's null distribution.
     if 'permuted_returns' in results_df.columns and len(results_df) > 0:
-        num_permutations_to_plot = 100  # Plot more paths for better distribution visualization
-        np.random.seed(42)  # For reproducibility
+        num_paths_to_plot = 100
+        np.random.seed(42)  # Seed for consistent reporting
         
-        for path_idx in range(num_permutations_to_plot):
+        for _ in range(num_paths_to_plot):
             cumulative_permuted = []
-            cum_sum = 0
+            current_sum = 0
+            
             for _, row in results_df.iterrows():
                 permuted_rets = row['permuted_returns']
                 if isinstance(permuted_rets, list) and len(permuted_rets) > 0:
-                    # Randomly sample one permuted return from this period's distribution
+                    # Sample one "what-if" return from the null distribution of this period
                     sampled_return = np.random.choice(permuted_rets)
-                    cum_sum += sampled_return
-                    cumulative_permuted.append(cum_sum)
+                    current_sum += sampled_return
+                    cumulative_permuted.append(current_sum)
                 else:
-                    cumulative_permuted.append(cum_sum)
+                    # Fallback if data missing
+                    cumulative_permuted.append(current_sum)
             
             if len(cumulative_permuted) == len(results_df):
                 ax.plot(results_df['test_end'], cumulative_permuted, 
-                       color='grey', alpha=0.2, linewidth=0.5, zorder=1)
+                       color='grey', alpha=0.15, linewidth=1, zorder=1)
     
-    # Add a line showing the mean of permuted strategies
+    # --- Plot Mean of Permutations (The Baseline) ---
     if 'permuted_returns_mean' in results_df.columns:
         results_df['cumulative_permuted_mean'] = results_df['permuted_returns_mean'].cumsum()
         ax.plot(results_df['test_end'], results_df['cumulative_permuted_mean'], 
-               color='darkgrey', linewidth=1.5, linestyle='--', 
-               label='Permutation Optimized (Mean)', zorder=5)
+               color='#555555', linewidth=2, linestyle='--', 
+               label='Mean Random Performance', zorder=5)
     
-    # Add confidence bands (percentiles of permuted distribution)
-    if 'permuted_returns' in results_df.columns and len(results_df) > 0:
-        # Calculate percentiles across all periods
-        percentiles_5 = []
-        percentiles_95 = []
-        cum_sum_5 = 0
-        cum_sum_95 = 0
-        for _, row in results_df.iterrows():
-            permuted_rets = row['permuted_returns']
-            if isinstance(permuted_rets, list) and len(permuted_rets) > 0:
-                cum_sum_5 += np.percentile(permuted_rets, 5)
-                cum_sum_95 += np.percentile(permuted_rets, 95)
-            percentiles_5.append(cum_sum_5)
-            percentiles_95.append(cum_sum_95)
-        
-        if len(percentiles_5) == len(results_df):
-            ax.fill_between(results_df['test_end'], percentiles_5, percentiles_95,
-                           color='lightgrey', alpha=0.3, label='95% Confidence Band', zorder=2)
+    # --- Plot Actual Strategy (The Alpha) ---
+    ax.plot(results_df['test_end'], results_df['cumulative_actual'], 
+            color='#d62728', linewidth=3, label='Real Optimized Strategy', zorder=10)
     
-    ax.set_title('Real Optimized vs Permutation Optimized Strategies\n(Monte Carlo Permutation Test)', 
-                 fontsize=16, fontweight='bold', color='black')
-    ax.set_xlabel('Date', fontsize=12, color='black')
-    ax.set_ylabel('Cumulative Log Return', fontsize=12, color='black')
-    ax.tick_params(colors='black')
-    ax.legend(loc='upper left', facecolor='white', edgecolor='black')
-    ax.grid(True, alpha=0.3, color='grey')
+    ax.set_title('Alpha Verification: Actual vs. Random Permutations', fontsize=16, fontweight='bold')
+    ax.set_xlabel('Test Period End Date', fontsize=12)
+    ax.set_ylabel('Cumulative Log Return', fontsize=12)
+    
+    # Create custom legend
+    ax.legend(loc='upper left', frameon=True, framealpha=0.9, facecolor='white')
+    ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    fig.savefig(output_path, dpi=200, facecolor='white', edgecolor='none')
+    fig.savefig(output_path, dpi=200)
     plt.close(fig)
     
 def generate_html_report(summary_df, results_df, stock_symbol, output_dir):
-    """Generates a comprehensive HTML report with summary and plots."""
+    """
+    Generates a comprehensive HTML report integrating all charts and metrics.
+    """
     env = Environment(loader=FileSystemLoader(os.path.dirname(os.path.abspath(__file__))))
-    template = env.from_string("""
+    
+    # Simple inline template for robustness
+    template_str = """
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Donchian MCPT Report: {{ stock_symbol }}</title>
+        <title>Hedge Fund Grade Report: {{ stock_symbol }}</title>
         <style>
-            body { font-family: sans-serif; margin: 2em; }
-            h1, h2 { color: #333; }
-            .summary-table { border-collapse: collapse; width: 100%; }
-            .summary-table th, .summary-table td { border: 1px solid #ddd; padding: 8px; }
-            .summary-table th { background-color: #f2f2f2; text-align: left; }
-            img { max-width: 100%; height: auto; margin-top: 1em; }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0 auto; max-width: 1200px; padding: 20px; background-color: #f9f9f9; }
+            h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+            h2 { color: #34495e; margin-top: 30px; }
+            .container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+            .summary-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+            .summary-table th, .summary-table td { border: 1px solid #e0e0e0; padding: 12px; text-align: left; }
+            .summary-table th { background-color: #f2f6fc; font-weight: 600; color: #2c3e50; }
+            .plot-container { text-align: center; margin: 20px 0; }
+            img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; }
+            .caption { font-style: italic; color: #666; margin-top: 8px; }
+            .metric-box { background-color: #e8f4f8; border-left: 4px solid #3498db; padding: 15px; margin: 10px 0; }
         </style>
     </head>
     <body>
-        <h1>Donchian Strategy Walk-Forward MCPT Report: {{ stock_symbol }}</h1>
-        <h2>Summary</h2>
+        <h1>Donchian Strategy Audit: {{ stock_symbol }}</h1>
+        
+        <div class="container">
+            <h2>Executive Summary</h2>
         {{ summary_table }}
-        <h2>Walk-Forward Performance</h2>
+            <div class="metric-box">
+                <strong>Methodology:</strong> Walk-Forward Optimization ({{ train_days }} day train / {{ test_days }} day test).
+                <br>
+                <strong>Validation:</strong> Monte Carlo Permutation Test ({{ mcpt_iter }} iterations per period).
+            </div>
+        </div>
+        <div class="container">
+            <h2>1. Alpha Verification (The "Money Plot")</h2>
+            <div class="plot-container">
+                <img src="actual_vs_permuted.png" alt="Actual vs Permuted">
+                <div class="caption">Red line = Your Strategy. Grey lines = Random Luck. If Red is above Grey, you have Alpha.</div>
+            </div>
+        </div>
+        <div class="container">
+            <h2>2. Equity Curve</h2>
+            <div class="plot-container">
         <img src="equity_curve.png" alt="Equity Curve">
-        <p><em>This chart shows the cumulative log returns over time for the Donchian strategy.</em></p>
+                <div class="caption">Cumulative Log Returns over the entire test history.</div>
+            </div>
+        </div>
+        <div class="container">
+            <h2>3. Statistical Robustness</h2>
+            <div class="plot-container">
+                <img src="p_value_dist.png" alt="P-Value Distribution">
+                <div class="caption">Distribution of P-Values. A left-skewed histogram (bars stacked near 0.0) indicates consistent statistical significance.</div>
+            </div>
+        </div>
     </body>
     </html>
-    """)
+    """
+    
+    template = env.from_string(template_str)
     
     summary_table_html = summary_df.to_html(classes='summary-table', index=False)
     
     html_content = template.render(
         stock_symbol=stock_symbol,
-        summary_table=summary_table_html
+        summary_table=summary_table_html,
+        train_days=TRAIN_PERIOD_DAYS,
+        test_days=TEST_PERIOD_DAYS,
+        mcpt_iter=MCPT_ITERATIONS
     )
     
     report_path = os.path.join(output_dir, "report.html")
     with open(report_path, 'w') as f:
         f.write(html_content)
-    print(f"📄 HTML report generated at: {report_path}")
+    print(f"📄 Professional HTML report generated at: {report_path}")
 
 def main():
     """
@@ -220,6 +250,8 @@ def main():
 
     # --- 3. Run Walk-Forward Analysis ---
     print("\n🚀 Starting Walk-Forward Analysis with MCPT...")
+    print(f"   Train Window: {TRAIN_PERIOD_DAYS} days | Test Window: {TEST_PERIOD_DAYS} days")
+    
     wf_analyzer = WalkForwardAnalysis(
         data=ohlc_data,
         train_period_days=TRAIN_PERIOD_DAYS,
@@ -228,37 +260,39 @@ def main():
     results_df = wf_analyzer.run(mcpt_iterations=MCPT_ITERATIONS)
 
     if results_df.empty:
-        print("❌ Walk-forward analysis produced no results. Check data length and period settings.")
+        print("❌ Walk-forward analysis produced no results. Check data length.")
         return
 
-    # --- 4. Analyze and Save Results ---
-    print("\n📊 Analyzing results...")
+    # --- 4. Analyze Results ---
+    print("\n📊 Calculating Performance Metrics...")
     
-    # Overall Performance
+    # Calculate total annualized return
     total_log_return = results_df['actual_returns'].sum()
-    total_p_value = results_df['p_value'].mean()
+    total_days = (results_df['test_end'].max() - results_df['test_start'].min()).days
+    annualized_return = (total_log_return / (total_days / 365.25)) if total_days > 0 else 0
+    
+    mean_p_value = results_df['p_value'].mean()
+    significant_periods = sum(results_df['p_value'] < 0.05)
+    total_periods = len(results_df)
     
     summary = {
         'Stock': stock_symbol,
-        'Total Log Return': total_log_return,
-        'Annualized Log Return': (total_log_return / ((results_df['test_end'].max() - results_df['test_start'].min()).days / 365.25)),
-        'Average P-Value': total_p_value,
-        'Num Walk-Forward Periods': len(results_df),
-        'Train Period Days': TRAIN_PERIOD_DAYS,
-        'Test Period Days': TEST_PERIOD_DAYS,
+        'Total Log Return': f"{total_log_return:.4f}",
+        'Annualized Return': f"{annualized_return:.2%}",
+        'Avg P-Value': f"{mean_p_value:.4f}",
+        'Significant Periods (p<0.05)': f"{significant_periods}/{total_periods}",
         'MCPT Iterations': MCPT_ITERATIONS
     }
     
     summary_df = pd.DataFrame([summary])
 
     print("\n" + "="*80)
-    print("📈 DONCHIAN STRATEGY - WALK-FORWARD MCPT SUMMARY")
+    print("📈 HEDGE FUND GRADE SUMMARY")
     print("="*80)
     print(summary_df.to_string(index=False))
     print("="*80)
-    print(f"Interpretation: A low 'Average P-Value' (e.g., < 0.10) suggests the strategy's positive returns are statistically significant and not likely due to random chance.")
 
-    # Save results
+    # Save raw data
     walkforward_results_path = os.path.join(output_dir, "results.csv")
     summary_path = os.path.join(output_dir, "summary.csv")
     
@@ -275,16 +309,30 @@ def main():
     except Exception as e:
         print(f"⚠️  Could not generate simple summary: {e}")
     
-    print(f"\n✅ Analysis complete for {stock_symbol}.")
+    # --- 5. Generate Visualizations ---
+    print("\n🎨 Generating PhD-Grade Visualizations...")
 
-    # --- 5. Generate Visualizations and Report ---
-    print("\n🎨 Generating visualizations...")
-    # Keep only essential visualization (equity curve)
+    # 1. Equity Curve
     equity_curve_path = os.path.join(output_dir, "equity_curve.png")
     plot_equity_curve(results_df, equity_curve_path)
     print(f"📈 Equity curve plot saved to: {equity_curve_path}")
 
+    # 2. P-Value Distribution (Robustness)
+    p_value_dist_path = os.path.join(output_dir, "p_value_dist.png")
+    plot_p_value_distribution(results_df, p_value_dist_path)
+    print(f"📊 P-value distribution plot saved to: {p_value_dist_path}")
+    
+    # 3. Actual vs Permuted (Null Hypothesis Check) - CRITICAL STEP
+    actual_vs_permuted_path = os.path.join(output_dir, "actual_vs_permuted.png")
+    plot_actual_vs_permuted(results_df, actual_vs_permuted_path)
+    print(f"🎯 Alpha verification plot saved to: {actual_vs_permuted_path}")
+    
+    print(f"\n✅ Charts saved to: {output_dir}")
+
+    # --- 6. Generate HTML Report ---
     generate_html_report(summary_df, results_df, stock_symbol, output_dir)
+    
+    print(f"\n✅ Analysis complete for {stock_symbol}.")
 
 if __name__ == "__main__":
     main()

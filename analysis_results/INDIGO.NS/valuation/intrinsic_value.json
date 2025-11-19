@@ -1,0 +1,15 @@
+{
+  "symbol": "INDIGO.NS",
+  "current_price": 5758.5,
+  "average_intrinsic_value": 2211.7910053294468,
+  "discount_premium_pct": -61.59084821864293,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-20T04:40:27.026208",
+  "valuation_methods": {
+    "Graham Formula": 814.5190769103251,
+    "DCF Model (10-year)": 5706.451009489929,
+    "P/E Based (Fair P/E=20)": 2640.199959212957,
+    "P/B Based (Fair P/B=3.0)": 670.092,
+    "PEG Based": 1227.692981034025
+  }
+}

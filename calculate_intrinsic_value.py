@@ -21,7 +21,13 @@ Usage:
     python3 calculate_intrinsic_value.py TICKER.NS
     python3 calculate_intrinsic_value.py RELIANCE.NS TCS.NS INFY.NS
 
-Version: 1.0 (Production Ready)
+Version: 2.0 (Hedge Fund Grade)
+- Sector-aware valuation (dynamic P/E and P/B by sector)
+- Live risk-free rate fetching
+- Special handling for Banks/Financials (DCF disabled, P/B focus)
+- Modified Graham Formula for IT/Services companies
+- Terminal value safety clamp
+- Cyclical stock adjustments for Basic Materials
 """
 
 import argparse
@@ -33,6 +39,129 @@ import yfinance as yf
 from datetime import datetime
 import warnings
 warnings.filterwarnings('ignore')
+
+
+def fetch_risk_free_rate():
+    """
+    Fetch live India 10-Year Government Bond Yield.
+    
+    Returns:
+        float: Risk-free rate (as decimal, e.g., 0.071 for 7.1%)
+    """
+    try:
+        # Try to fetch India 10-Year Bond Yield
+        # Common tickers: ^IGSEC (India Government Securities), or use generic proxy
+        bond_tickers = ['^IGSEC', '^NSEI']  # Fallback options
+        
+        for ticker_symbol in bond_tickers:
+            try:
+                bond_ticker = yf.Ticker(ticker_symbol)
+                hist = bond_ticker.history(period='5d')
+                if not hist.empty and 'Close' in hist.columns:
+                    # If it's a bond yield, it's typically already in percentage
+                    yield_value = hist['Close'].iloc[-1]
+                    # Convert to decimal if it appears to be in percentage (> 1)
+                    if yield_value > 1:
+                        risk_free = yield_value / 100
+                    else:
+                        risk_free = yield_value
+                    # Sanity check: should be between 5% and 10% for India
+                    if 0.05 <= risk_free <= 0.10:
+                        print(f"   📈 Live Risk-Free Rate: {risk_free*100:.2f}% (from {ticker_symbol})")
+                        return risk_free
+            except:
+                continue
+        
+        # Fallback: Use reasonable default for India (7.1%)
+        print(f"   ⚠️  Using default Risk-Free Rate: 7.1% (could not fetch live data)")
+        return 0.071
+    except Exception as e:
+        # Fallback to default
+        print(f"   ⚠️  Using default Risk-Free Rate: 7.1% (error: {e})")
+        return 0.071
+
+
+def get_sector_benchmarks(sector, industry=None):
+    """
+    Return fair P/E and P/B based on sector norms for Indian market.
+    
+    Args:
+        sector (str): Sector name
+        industry (str, optional): Industry name for more specific classification
+    
+    Returns:
+        tuple: (fair_pe, fair_pb) for the sector
+    """
+    # Sector-specific benchmarks for Indian market
+    benchmarks = {
+        'Technology': (25, 5.0),              # IT commands higher premiums (TCS, Infosys)
+        'Consumer Defensive': (45, 12.0),      # FMCG is expensive (Nestle, HUL, Britannia)
+        'Financial Services': (18, 3.0),       # Banks and NBFCs
+        'Basic Materials': (10, 1.2),          # Commodities (Steel, Metals)
+        'Industrials': (20, 3.0),              # Capital Goods (BHEL, L&T)
+        'Energy': (12, 1.5),                   # Oil & Gas
+        'Healthcare': (25, 4.0),               # Pharma
+        'Consumer Cyclical': (20, 3.5),       # Retail, Auto
+        'Communication Services': (18, 2.5),   # Telecom
+        'Utilities': (15, 1.8),                # Power
+        'Real Estate': (15, 2.0),              # Real Estate
+    }
+    
+    # Industry-specific overrides (more granular)
+    if industry:
+        industry_lower = industry.lower()
+        if 'bank' in industry_lower or 'financial' in industry_lower:
+            # Private banks vs PSU banks
+            if 'private' in industry_lower or 'hdfc' in industry_lower or 'icici' in industry_lower:
+                return (20, 2.5)  # Private banks
+            else:
+                return (12, 1.2)  # PSU banks
+        elif 'steel' in industry_lower or 'metal' in industry_lower:
+            return (8, 1.0)  # Very cyclical, lower multiples
+        elif 'fmcg' in industry_lower or 'consumer' in industry_lower:
+            return (50, 15.0)  # Premium FMCG
+    
+    # Return sector benchmark or default conservative values
+    return benchmarks.get(sector, (15, 1.5))
+
+
+def is_financial_company(sector, industry):
+    """
+    Check if company is a bank or financial services company.
+    
+    Args:
+        sector (str): Sector name
+        industry (str): Industry name
+    
+    Returns:
+        bool: True if financial company
+    """
+    financial_keywords = ['bank', 'financial', 'nbfc', 'finance', 'credit', 'lending']
+    sector_lower = (sector or '').lower()
+    industry_lower = (industry or '').lower()
+    
+    return (any(keyword in sector_lower for keyword in financial_keywords) or
+            any(keyword in industry_lower for keyword in financial_keywords))
+
+
+def is_asset_light_company(sector, industry):
+    """
+    Check if company is asset-light (IT, Services, Software).
+    These companies have low book value, so standard Graham formula doesn't work well.
+    
+    Args:
+        sector (str): Sector name
+        industry (str): Industry name
+    
+    Returns:
+        bool: True if asset-light company
+    """
+    asset_light_keywords = ['technology', 'software', 'it services', 'consulting', 'services']
+    sector_lower = (sector or '').lower()
+    industry_lower = (industry or '').lower()
+    
+    return (any(keyword in sector_lower for keyword in asset_light_keywords) or
+            any(keyword in industry_lower for keyword in asset_light_keywords))
 
 
 def fetch_fundamental_data(symbol):
@@ -100,10 +229,10 @@ def fetch_fundamental_data(symbol):
             # Growth Rates
             'earnings_growth_5y': info.get('earningsGrowth', None),
             'revenue_growth_5y': info.get('revenueGrowth', None),
-            
-            # Risk-free rate (using 10-year bond yield as proxy)
-            'risk_free_rate': 0.07,  # 7% for Indian context (can be updated)
         }
+        
+        # Fetch live risk-free rate
+        data['risk_free_rate'] = fetch_risk_free_rate()
         
         # Try to get EPS from financials if not in info
         if data['trailing_pe'] and data['current_price']:
@@ -178,8 +307,9 @@ def calculate_graham_intrinsic_value(data):
     """
     Calculate intrinsic value using Benjamin Graham's formula.
     
-    Formula: IV = sqrt(22.5 * EPS * BVPS)
-    Where: 22.5 = 15 P/E * 1.5 P/B (Graham's preferred ratios)
+    For traditional companies: IV = sqrt(22.5 * EPS * BVPS)
+    For asset-light companies (IT/Services): IV = EPS * (8.5 + 2g)
+    Where: g is the growth rate
     
     Args:
         data (dict): Fundamental data dictionary
@@ -187,20 +317,55 @@ def calculate_graham_intrinsic_value(data):
     Returns:
         float: Intrinsic value
     """
-    if not data.get('eps') or not data.get('book_value'):
+    if not data.get('eps'):
         return None
     
     try:
+        sector = data.get('sector', '')
+        industry = data.get('industry', '')
+        
+        # Use Modified Graham Formula for asset-light companies
+        if is_asset_light_company(sector, industry):
+            # Modified Graham: V = EPS * (8.5 + 2g)
+            # Get growth rate
+            growth_rate = None
+            if data.get('earnings_growth_5y') and data['earnings_growth_5y'] > 0:
+                growth_rate = min(data['earnings_growth_5y'], 0.30)  # Cap at 30%
+            elif data.get('revenue_growth_5y') and data['revenue_growth_5y'] > 0:
+                growth_rate = min(data['revenue_growth_5y'], 0.25)
+            elif data.get('earnings_growth') and data['earnings_growth'] > 0:
+                growth_rate = min(data['earnings_growth'], 0.20)
+            
+            if growth_rate and growth_rate > 0:
+                # Convert growth rate to percentage for formula
+                g_percentage = growth_rate * 100
+                # Use conservative base of 7 instead of 8.5 for Indian context
+                intrinsic_value = data['eps'] * (7 + 2 * g_percentage)
+                # Cap the multiplier at reasonable level (max P/E of 25)
+                max_multiplier = 25
+                if (7 + 2 * g_percentage) > max_multiplier:
+                    intrinsic_value = data['eps'] * max_multiplier
+                return intrinsic_value
+            else:
+                # Fallback: Use conservative P/E of 15 if no growth data
+                return data['eps'] * 15
+        
+        # Standard Graham Formula for traditional companies
+        if not data.get('book_value'):
+            return None
+        
         # Graham's formula: IV = sqrt(22.5 * EPS * BVPS)
         intrinsic_value = (22.5 * data['eps'] * data['book_value']) ** 0.5
         return intrinsic_value
-    except:
+    except Exception as e:
         return None
 
 
 def calculate_dcf_intrinsic_value(data, growth_rate=None, terminal_growth=0.03, years=10):
     """
     Calculate intrinsic value using simplified DCF model.
+    
+    NOTE: DCF is NOT suitable for Banks/Financials. Use P/B or DDM instead.
     
     Args:
         data (dict): Fundamental data dictionary
@@ -209,8 +374,14 @@ def calculate_dcf_intrinsic_value(data, growth_rate=None, terminal_growth=0.03, 
         years (int): Number of years to project
     
     Returns:
-        float: Intrinsic value per share
+        float: Intrinsic value per share, or None if not applicable (e.g., for banks)
     """
+    # Skip DCF for financial companies
+    sector = data.get('sector', '')
+    industry = data.get('industry', '')
+    if is_financial_company(sector, industry):
+        print(f"   ⚠️  DCF not suitable for {sector}/{industry}. Using P/B focus instead.")
+        return None
     # Try to get FCF first, fallback to operating cash flow or EPS-based proxy
     fcf = data.get('free_cashflow')
     operating_cf = data.get('operating_cashflow')
@@ -255,12 +426,23 @@ def calculate_dcf_intrinsic_value(data, growth_rate=None, terminal_growth=0.03, 
         
         # Discount rate (WACC approximation)
         # Risk-free rate + market risk premium
-        discount_rate = data.get('risk_free_rate', 0.07) + 0.05  # 12% total
+        risk_free = data.get('risk_free_rate', 0.071)
+        discount_rate = risk_free + 0.05  # 5% market risk premium
         
         # For cyclical or high-risk stocks, adjust discount rate
         if data.get('debt_to_equity') and data['debt_to_equity'] > 1.5:
             discount_rate += 0.02  # Add 2% for high debt
             print(f"   ⚠️  Adjusted discount rate for high debt: {discount_rate*100:.1f}%")
+        
+        # CRITICAL FIX: Terminal growth safety clamp
+        # Terminal growth should never exceed risk-free rate
+        # If discount rate is close to terminal growth, denominator becomes tiny
+        terminal_growth = min(terminal_growth, risk_free - 0.01)  # Keep at least 1% spread
+        
+        # Additional safety: Ensure discount_rate > terminal_growth
+        if discount_rate <= terminal_growth:
+            terminal_growth = discount_rate - 0.01
+            print(f"   ⚠️  Adjusted terminal growth to {terminal_growth*100:.1f}% for safety")
         
         # Project future cash flows
         pv_fcf = 0
@@ -268,9 +450,13 @@ def calculate_dcf_intrinsic_value(data, growth_rate=None, terminal_growth=0.03, 
             future_fcf = fcf_per_share * ((1 + growth_rate) ** year)
             pv_fcf += future_fcf / ((1 + discount_rate) ** year)
         
-        # Terminal value
+        # Terminal value (with safety check)
         terminal_fcf = fcf_per_share * ((1 + growth_rate) ** years) * (1 + terminal_growth)
-        terminal_value = terminal_fcf / (discount_rate - terminal_growth)
+        denominator = discount_rate - terminal_growth
+        if denominator <= 0:
+            print(f"   ❌ DCF calculation error: Invalid discount/terminal growth spread")
+            return None
+        terminal_value = terminal_fcf / denominator
         pv_terminal = terminal_value / ((1 + discount_rate) ** years)
         
         intrinsic_value = pv_fcf + pv_terminal
@@ -285,13 +471,16 @@ def calculate_dcf_intrinsic_value(data, growth_rate=None, terminal_growth=0.03, 
         return None
 
 
-def calculate_pe_based_intrinsic_value(data, fair_pe=15):
+def calculate_pe_based_intrinsic_value(data, fair_pe=15, use_cyclical_adjustment=True):
     """
     Calculate intrinsic value based on fair P/E ratio.
+    
+    For cyclical stocks (Basic Materials), compares current P/E to historical median.
     
     Args:
         data (dict): Fundamental data dictionary
         fair_pe (float): Fair P/E ratio (default 15, can be adjusted based on sector)
+        use_cyclical_adjustment (bool): Apply cyclical stock logic for Basic Materials
     
     Returns:
         float: Intrinsic value
@@ -300,6 +489,19 @@ def calculate_pe_based_intrinsic_value(data, fair_pe=15):
         return None
     
     try:
+        # Cyclical stock adjustment for Basic Materials
+        if use_cyclical_adjustment and data.get('sector') == 'Basic Materials':
+            current_pe = data.get('trailing_pe')
+            if current_pe and current_pe > 0:
+                # For cyclical stocks, low P/E often means "top of cycle" (sell signal)
+                # High P/E means "bottom of cycle" (buy signal)
+                # Use a conservative approach: if current P/E is very low, be cautious
+                if current_pe < fair_pe * 0.7:  # Current P/E is 30% below fair
+                    print(f"   ⚠️  Cyclical stock: Current P/E ({current_pe:.1f}) is low.")
+                    print(f"      This may indicate top of cycle. Using conservative valuation.")
+                    # Use slightly lower fair P/E for safety
+                    fair_pe = fair_pe * 0.9
+        
         intrinsic_value = data['eps'] * fair_pe
         return intrinsic_value
     except:
@@ -422,11 +624,21 @@ def analyze_valuation(symbol):
         return None
     
     current_price = data['current_price']
+    sector = data.get('sector', 'N/A')
+    industry = data.get('industry', 'N/A')
     
     print(f"\n📈 Current Market Price: ₹{current_price:.2f}")
     print(f"📋 Company: {data.get('name', 'N/A')}")
-    print(f"🏢 Sector: {data.get('sector', 'N/A')}")
-    print(f"🏭 Industry: {data.get('industry', 'N/A')}")
+    print(f"🏢 Sector: {sector}")
+    print(f"🏭 Industry: {industry}")
+    
+    # Get sector-specific benchmarks
+    fair_pe, fair_pb = get_sector_benchmarks(sector, industry)
+    print(f"\nℹ️  Using Sector Benchmarks: Fair P/E={fair_pe}, Fair P/B={fair_pb}")
+    
+    # Special note for financial companies
+    if is_financial_company(sector, industry):
+        print(f"   📌 Financial Company: DCF disabled, focusing on P/B and P/E analysis")
     
     # Calculate intrinsic values using different methods
     print("\n" + "-"*80)
@@ -435,33 +647,37 @@ def analyze_valuation(symbol):
     
     results = {}
     
-    # 1. Graham's Formula
+    # 1. Graham's Formula (or Modified Graham for IT/Services)
     graham_iv = calculate_graham_intrinsic_value(data)
     if graham_iv:
-        results['Graham Formula'] = graham_iv
+        method_name = "Modified Graham" if is_asset_light_company(sector, industry) else "Graham Formula"
+        results[f'{method_name}'] = graham_iv
         discount = ((graham_iv - current_price) / current_price) * 100
-        print(f"1️⃣  Graham's Formula:        ₹{graham_iv:.2f} ({discount:+.1f}%)")
+        print(f"1️⃣  {method_name}:        ₹{graham_iv:.2f} ({discount:+.1f}%)")
     
-    # 2. DCF Model
+    # 2. DCF Model (skipped for financials)
     dcf_iv = calculate_dcf_intrinsic_value(data)
     if dcf_iv:
-        results['DCF Model'] = dcf_iv
+        results['DCF Model (10-year)'] = dcf_iv
         discount = ((dcf_iv - current_price) / current_price) * 100
         print(f"2️⃣  DCF Model (10-year):      ₹{dcf_iv:.2f} ({discount:+.1f}%)")
     
-    # 3. P/E Based
-    pe_iv = calculate_pe_based_intrinsic_value(data)
+    # 3. P/E Based (with sector-specific fair P/E)
+    pe_iv = calculate_pe_based_intrinsic_value(data, fair_pe=fair_pe)
     if pe_iv:
-        results['P/E Based (Fair P/E=15)'] = pe_iv
+        results[f'P/E Based (Fair P/E={fair_pe})'] = pe_iv
         discount = ((pe_iv - current_price) / current_price) * 100
-        print(f"3️⃣  P/E Based (Fair P/E=15):   ₹{pe_iv:.2f} ({discount:+.1f}%)")
+        print(f"3️⃣  P/E Based (Fair P/E={fair_pe}):   ₹{pe_iv:.2f} ({discount:+.1f}%)")
     
-    # 4. P/B Based
-    pb_iv = calculate_pb_based_intrinsic_value(data)
+    # 4. P/B Based (with sector-specific fair P/B, especially important for financials)
+    pb_iv = calculate_pb_based_intrinsic_value(data, fair_pb=fair_pb)
     if pb_iv:
-        results['P/B Based (Fair P/B=1.5)'] = pb_iv
+        results[f'P/B Based (Fair P/B={fair_pb})'] = pb_iv
         discount = ((pb_iv - current_price) / current_price) * 100
-        print(f"4️⃣  P/B Based (Fair P/B=1.5):  ₹{pb_iv:.2f} ({discount:+.1f}%)")
+        print(f"4️⃣  P/B Based (Fair P/B={fair_pb}):  ₹{pb_iv:.2f} ({discount:+.1f}%)")
+        # For financial companies, emphasize P/B
+        if is_financial_company(sector, industry):
+            print(f"      ⭐ Primary valuation method for {sector}")
     
     # 5. PEG Based
     peg_iv = calculate_peg_based_intrinsic_value(data)

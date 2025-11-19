@@ -1,0 +1,15 @@
+{
+  "symbol": "JINDALSTEL.NS",
+  "current_price": 1071.0,
+  "average_intrinsic_value": 604.0443681447621,
+  "discount_premium_pct": -43.59996562607263,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-20T02:31:12.570755",
+  "valuation_methods": {
+    "Graham Formula": 544.4107506648592,
+    "DCF Model": 1225.4425748715535,
+    "P/E Based (Fair P/E=15)": 404.7000118651544,
+    "P/B Based (Fair P/B=1.5)": 732.3525,
+    "PEG Based": 113.31600332224323
+  }
+}

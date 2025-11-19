@@ -9,7 +9,16 @@ import os
 import sys
 import pandas as pd
 import numpy as np
-from behavioral_patterns import load_analysis_data, get_indicator_columns
+import importlib.util
+
+# Import from 04_behavioral_patterns.py
+script_dir = os.path.dirname(os.path.abspath(__file__))
+behavioral_patterns_path = os.path.join(script_dir, '04_behavioral_patterns.py')
+spec = importlib.util.spec_from_file_location("behavioral_patterns", behavioral_patterns_path)
+behavioral_patterns = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(behavioral_patterns)
+load_analysis_data = behavioral_patterns.load_analysis_data
+get_indicator_columns = behavioral_patterns.get_indicator_columns
 
 
 def analyze_drawdown_periods(results_file, regime_file, threshold_percentile=25):

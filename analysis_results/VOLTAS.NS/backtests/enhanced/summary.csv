@@ -1,0 +1,2 @@
+Stock,Strategy,Total Log Return,Annualized Return,Average P-Value,Num Walk-Forward Periods,Regime Filtering,Pattern Exit
+VOLTAS.NS,Enhanced Donchian (Regime Filtered + Pattern Exit),6.5695,31.39%,0.5989,42,✅ Enabled,✅ Enabled

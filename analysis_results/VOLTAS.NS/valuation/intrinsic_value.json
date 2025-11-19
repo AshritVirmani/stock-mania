@@ -1,0 +1,14 @@
+{
+  "symbol": "VOLTAS.NS",
+  "current_price": 1401.800048828125,
+  "average_intrinsic_value": 378.39925961933113,
+  "discount_premium_pct": -73.00618872601233,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-20T04:03:16.295828",
+  "valuation_methods": {
+    "Graham Formula": 267.39055395102577,
+    "DCF Model (10-year)": 244.4179619116433,
+    "P/E Based (Fair P/E=20)": 332.2000226146555,
+    "P/B Based (Fair P/B=3.5)": 669.5885000000001
+  }
+}
