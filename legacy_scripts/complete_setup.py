@@ -25,6 +25,8 @@ import os
 import sys
 import subprocess
 import pandas as pd
+import yfinance as yf
+import time
 
 # Get the directory where this script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -94,6 +96,22 @@ def run_complete_setup(stock_symbol):
     print("="*80)
     print(f"📥 Fetching historical data for {stock_symbol}...")
     print("   (This may take a few minutes for stocks with long histories)")
+    
+    # Check if a recent analysis file already exists
+    analysis_file_path = get_analysis_file_path(stock_symbol)
+    if os.path.exists(analysis_file_path):
+        # Check file age
+        file_mod_time = os.path.getmtime(analysis_file_path)
+        if (time.time() - file_mod_time) / 3600 < 24: # If less than 24 hours old
+            print(f"✅ Using recent analysis file: {analysis_file_path}")
+            return analysis_file_path
+
+    # Proceed with fetching and analysis if no recent file
+    stock_data = fetch_stock_data(stock_symbol)
+    if stock_data is None:
+        return None
+
+    print("Applying technical analysis indicators...")
     
     try:
         result = subprocess.run(

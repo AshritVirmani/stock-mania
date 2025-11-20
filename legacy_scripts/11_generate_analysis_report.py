@@ -54,18 +54,19 @@ def get_backtests_dir(stock_symbol, strategy="standard"):
 
 
 def get_image_as_base64(path):
-    """Encodes an image file into a base64 string for embedding in HTML."""
+    """Returns a base64 encoded string of an image."""
     if not os.path.exists(path):
         return None
     try:
-    with open(path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
+        with open(path, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+        return encoded_string
     except Exception as e:
-        print(f"⚠️  Could not load image {path}: {e}")
+        print(f"Error encoding image {path}: {e}")
         return None
 
 
-def create_html_table(df, classes="table table-bordered table-hover table-sm"):
+def create_html_table(df, classes="table table-striped"):
     """Converts a pandas DataFrame to an HTML table with nice styling."""
     if df is None or df.empty:
         return "<p><em>No data available.</em></p>"

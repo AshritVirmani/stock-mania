@@ -28,15 +28,28 @@ BASE_DIR = os.path.join(PROJECT_ROOT, "analysis_results")
 
 
 def get_paths(symbol):
-    """Get all relevant paths for a ticker."""
-    base = os.path.join(BASE_DIR, symbol)
-    return {
-        'analysis': os.path.join(base, "analysis"),
-        'reports': os.path.join(base, "reports"),
-        'backtests_standard': os.path.join(base, "backtests", "standard"),
-        'backtests_enhanced': os.path.join(base, "backtests", "enhanced"),
-        'root': base
+    """Returns a dictionary of required paths."""
+    paths = {
+        "base": os.path.join("analysis_results", symbol),
+        "reports": os.path.join("analysis_results", symbol, "reports"),
+        "analysis": os.path.join("analysis_results", symbol, "analysis"),
+        "valuation": os.path.join("analysis_results", symbol, "valuation"),
+        "backtests_standard": os.path.join("analysis_results", symbol, "backtests", "standard"),
+        "backtests_enhanced": os.path.join("analysis_results", symbol, "backtests", "enhanced")
     }
+    paths["valuation_output"] = os.path.join(paths["valuation"], "valuation_output.txt")
+    paths["strategy_comparison"] = os.path.join(paths["reports"], "strategy_comparison.png")
+    paths["filter_impact"] = os.path.join(paths["reports"], "filter_impact_equity_curve.png")
+    paths["backtest_comparison_csv"] = os.path.join(paths["reports"], "backtest_comparison.csv")
+    paths["whale_pro_chart"] = os.path.join(paths["analysis"], "whale_entry_map_pro.png")
+    paths["whale_calendar"] = os.path.join(paths["analysis"], "complete_whale_calendar.html")
+    paths["market_regimes"] = os.path.join(paths["analysis"], "market_regimes_plot.png")
+    paths["future_projection"] = os.path.join(paths["analysis"], f"{symbol}_future_projection_spaghetti.png")
+    paths["actual_vs_permuted"] = os.path.join(paths["backtests_standard"], "actual_vs_permuted.png")
+    paths["p_value_dist"] = os.path.join(paths["analysis"], "p_value_distribution.png")
+    paths["correlation_clustered"] = os.path.join(paths["analysis"], "correlation_heatmap_clustered.png")
+    paths["correlation_filtered"] = os.path.join(paths["analysis"], "correlation_heatmap.png")
+    return paths
 
 
 def get_image_b64(path):
@@ -51,12 +64,12 @@ def get_image_b64(path):
     return None
 
 
-def get_img_tag(b64_data):
+def get_img_tag(b64_data, alt_text="Visual artifact not found."):
     """Generate HTML img tag with base64 data or warning message."""
     if b64_data:
-        return f'<div class="img-wrapper"><img src="data:image/png;base64,{b64_data}" class="img-fluid"></div>'
+        return f'<div class="img-wrapper"><img src="data:image/png;base64,{b64_data}" class="img-fluid" alt="{alt_text}"></div>'
     else:
-        return '<div class="alert alert-warning p-3 text-center">⚠️ Visual artifact not found. Ensure analysis pipeline has run completely.</div>'
+        return f'<div class="alert alert-warning p-3 text-center">{alt_text}</div>'
 
 
 def generate_dashboard(symbol):
@@ -68,51 +81,40 @@ def generate_dashboard(symbol):
     # 1. Load Assets (The Visual Proof)
     print("   Gathering visual assets...")
     assets = {
-        # Strategy Validation
-        'equity_curve': get_image_b64(os.path.join(paths['reports'], "filter_impact_equity_curve.png")),
-        'mcpt_cloud': get_image_b64(os.path.join(paths['backtests_standard'], "actual_vs_permuted.png")),
-        
-        # Institutional Radar (Whales)
-        'whale_map': get_image_b64(os.path.join(paths['analysis'], "whale_entry_map.png")),
-        'whale_map_pro': get_image_b64(os.path.join(paths['analysis'], "whale_entry_map_pro.png")),
-        # Note: whale_calendar.png doesn't exist, we have complete_whale_calendar.html instead
-        # We'll embed the HTML calendar separately if needed
-        
-        # Market Context (Regimes)
-        'regime_plot': get_image_b64(os.path.join(paths['analysis'], "market_regimes_plot.png")),
-        
-        # Forecasting
-        'forecast': get_image_b64(os.path.join(paths['analysis'], f"{symbol}_future_projection_spaghetti.png")),
-        
-        # Correlation Analysis
-        'correlation_heatmap': get_image_b64(os.path.join(paths['analysis'], "correlation_heatmap_clustered.png")),
-        'correlation_filtered': get_image_b64(os.path.join(paths['analysis'], "correlation_heatmap.png")),
+        "strategy_comparison": get_image_b64(paths["strategy_comparison"]),
+        "filter_impact": get_image_b64(paths["filter_impact"]),
+        "whale_pro_chart": get_image_b64(paths["whale_pro_chart"]),
+        "market_regimes": get_image_b64(paths["market_regimes"]),
+        "future_projection": get_image_b64(paths["future_projection"]),
+        "actual_vs_permuted": get_image_b64(paths["actual_vs_permuted"]),
+        "p_value_dist": get_image_b64(paths["p_value_dist"]),
+        "correlation_clustered": get_image_b64(paths["correlation_clustered"]),
+        "correlation_filtered": get_image_b64(paths["correlation_filtered"]),
     }
-    
+
     # Try alternative paths for forecast
-    if not assets['forecast']:
+    if not assets['future_projection']:
         # Try without symbol prefix
-        assets['forecast'] = get_image_b64(os.path.join(paths['analysis'], "future_projection_spaghetti.png"))
+        assets['future_projection'] = get_image_b64(os.path.join(paths['analysis'], "future_projection_spaghetti.png"))
     
-    # 2. Load Metrics (The Numbers)
-    print("   Loading performance metrics...")
-    stats_html = '<div class="alert alert-secondary">No backtest data found. Run <code>10_compare_backtests.py</code> first.</div>'
-    comparison_path = os.path.join(paths['reports'], "backtest_comparison.csv")
-    
-    if os.path.exists(comparison_path):
-        try:
-            df = pd.read_csv(comparison_path)
-            # Style the table with Bootstrap classes
-            stats_html = df.to_html(classes='table table-sm table-hover', index=False, border=0, escape=False)
-        except Exception as e:
-            print(f"⚠️  Could not load comparison data: {e}")
-    
-    # 3. Check for whale calendar HTML
-    whale_calendar_path = os.path.join(paths['analysis'], "complete_whale_calendar.html")
-    whale_calendar_exists = os.path.exists(whale_calendar_path)
-    
-    # 4. Generate HTML
+    # --- Read Performance Data ---
+    try:
+        comparison_df = pd.read_csv(paths["backtest_comparison_csv"])
+        perf_audit_html = comparison_df.to_html(classes="table table-sm table-hover table-bordered", index=False)
+    except Exception:
+        perf_audit_html = '<div class="alert alert-warning">No backtest data found. Run <code>10_compare_backtests.py</code> first.</div>'
+
+    # --- Read Valuation Data ---
+    try:
+        with open(paths["valuation_output"], "r") as f:
+            valuation_text = f.read()
+    except Exception:
+        valuation_text = "Valuation analysis not found."
+
+
     print("   Assembling HTML dashboard...")
+    
+    # --- HTML Structure ---
     html = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -167,7 +169,7 @@ def generate_dashboard(symbol):
                             <small class="text-muted">Blind (Grey) vs. Filtered (Green)</small>
                         </div>
                         <div class="card-body">
-                            {get_img_tag(assets['equity_curve'])}
+                            {get_img_tag(assets['filter_impact'])}
                         </div>
                     </div>
                 </div>
@@ -175,7 +177,7 @@ def generate_dashboard(symbol):
                     <div class="card h-100">
                         <div class="card-header">Performance Audit</div>
                         <div class="card-body">
-                            {stats_html}
+                            {perf_audit_html}
                             <div class="mt-3 small text-muted">
                                 <strong>Interpretation:</strong> The 'Enhanced' column represents the strategy with Regime Filtering active. A positive difference indicates the Regime Filter successfully avoided losses.
                             </div>
@@ -196,13 +198,13 @@ def generate_dashboard(symbol):
                                 <div class="col-md-6">
                                     <h5>Bloomberg-Style Deep Dive</h5>
                                     <p class="text-muted small">Professional candlestick chart with whale signals overlaid. Shows exact entry points with price action context.</p>
-                                    {get_img_tag(assets['whale_map_pro'])}
+                                    {get_img_tag(assets['whale_pro_chart'])}
                                     <p class="small text-muted mt-2"><strong>Green Triangle (^):</strong> Ignition - Breakout with volume | <strong>Blue Circle (o):</strong> Stealth - Accumulation | <strong>Red Triangle (v):</strong> Trap - Selling into strength</p>
                                 </div>
                                 <div class="col-md-6">
                                     <h5>Activity Calendar</h5>
                                     <p class="text-muted small">Master Strategy Calendar showing whale signals with regime-aware filtering.</p>
-                                    {f'<div class="img-wrapper"><iframe src="analysis/complete_whale_calendar.html" style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 4px;"></iframe><p class="text-muted small mt-2"><a href="analysis/complete_whale_calendar.html" target="_blank">Open calendar in new tab</a></p></div>' if whale_calendar_exists else '<div class="alert alert-warning">Whale calendar not found. Run <code>12_whale_calendar.py</code> to generate.</div>'}
+                                    {f'<div class="img-wrapper"><iframe src="analysis/complete_whale_calendar.html" style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 4px;"></iframe><p class="text-muted small mt-2"><a href="analysis/complete_whale_calendar.html" target="_blank">Open calendar in new tab</a></p></div>' if os.path.exists(paths["whale_calendar"]) else '<div class="alert alert-warning">Whale calendar not found. Run <code>12_whale_calendar.py</code> to generate.</div>'}
                                 </div>
                             </div>
                             <div class="row mt-4">
@@ -227,13 +229,27 @@ def generate_dashboard(symbol):
 
             <div class="row mt-4">
                 <div class="col-12">
-                    <h3 class="section-title">3. Market Context & Forecasting</h3>
+                    <h3 class="section-title">3. Intrinsic Value Analysis</h3>
+                </div>
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">Valuation Summary</div>
+                        <div class="card-body">
+                            <pre class="bg-light p-3 rounded" style="white-space: pre-wrap; word-wrap: break-word;"><code>{valuation_text}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h3 class="section-title">4. Market Context & Forecasting</h3>
                 </div>
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-header">Market Regimes (The Season)</div>
                         <div class="card-body">
-                            {get_img_tag(assets['regime_plot'])}
+                            {get_img_tag(assets['market_regimes'])}
                             <p class="mt-2 small text-muted">Colors represent the current 'mood' of the stock. Avoid trading during the 'Crash' regime (usually lowest return color).</p>
                         </div>
                     </div>
@@ -242,7 +258,7 @@ def generate_dashboard(symbol):
                     <div class="card h-100">
                         <div class="card-header">Future Projection (Similarity)</div>
                         <div class="card-body">
-                            {get_img_tag(assets['forecast'])}
+                            {get_img_tag(assets['future_projection'])}
                             <p class="mt-2 small text-muted">The 'Spaghetti Plot' projects the next 10 days based on the 10 most historically similar patterns to today.</p>
                         </div>
                     </div>
@@ -254,7 +270,7 @@ def generate_dashboard(symbol):
                     <div class="card">
                          <div class="card-header">4. Statistical Significance (Null Hypothesis)</div>
                          <div class="card-body text-center">
-                            {get_img_tag(assets['mcpt_cloud'])}
+                            {get_img_tag(assets['actual_vs_permuted'])}
                             <p class="small text-muted mt-2">If the Red Line is above the Grey Cloud, the strategy is statistically superior to luck.</p>
                          </div>
                     </div>
@@ -269,7 +285,7 @@ def generate_dashboard(symbol):
                     <div class="card h-100">
                         <div class="card-header">Clustered View (Redundancy Detection)</div>
                         <div class="card-body">
-                            {get_img_tag(assets['correlation_heatmap'])}
+                            {get_img_tag(assets['correlation_clustered'])}
                             <p class="mt-2 small text-muted">Hierarchical clustering groups similar indicators together. Indicators in the same cluster are highly correlated and may be redundant.</p>
                         </div>
                     </div>
@@ -295,7 +311,7 @@ def generate_dashboard(symbol):
     </html>
     """
     
-    output_path = os.path.join(paths['root'], f"{symbol}_Alpha_Deck.html")
+    output_path = os.path.join(paths['base'], f"{symbol}_Alpha_Deck.html")
     with open(output_path, "w", encoding='utf-8') as f:
         f.write(html)
     

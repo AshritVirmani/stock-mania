@@ -319,13 +319,13 @@ def compare_backtests(stock_symbol, analyze_regimes=True):
             enh_results = pd.read_csv(files['enh_res'])
             std_summary = pd.read_csv(files['std_sum']) if 'std_sum' in files else None
             enh_summary = pd.read_csv(files['enh_sum']) if 'enh_sum' in files else None
-        
-        # Calculate is_significant if not present
+    
+    # Calculate is_significant if not present
         if 'is_significant' not in std_results.columns and 'p_value' in std_results.columns:
             std_results['is_significant'] = std_results['p_value'] < 0.05
         if 'actual_returns' not in std_results.columns and 'log_return' in std_results.columns:
             std_results['actual_returns'] = std_results['log_return']
-        
+    
         if has_enhanced:
             if 'is_significant' not in enh_results.columns and 'p_value' in enh_results.columns:
                 enh_results['is_significant'] = enh_results['p_value'] < 0.05
@@ -344,7 +344,8 @@ def compare_backtests(stock_symbol, analyze_regimes=True):
         print("\n🔵 STANDARD DONCHIAN (No Filters)")
         # Handle different column name variations
         std_total_ret = float(std_summary['Total Log Return'].iloc[0])
-        # Try different column name variations
+        
+        # Handle different column name variations for Annualized Return
         ann_ret_col = None
         for col in ['Annualized Return', 'Annualized Log Return']:
             if col in std_summary.columns:
@@ -364,6 +365,7 @@ def compare_backtests(stock_symbol, analyze_regimes=True):
                 pval_col = col
                 break
         std_pval = float(std_summary[pval_col].iloc[0]) if pval_col else 0.0
+
         print(f"   Total Log Return:        {std_total_ret:.4f} ({std_total_ret*100:.1f}%)")
         print(f"   Annualized Return:       {std_ann_ret:.4f} ({std_ann_ret*100:.1f}%)")
         print(f"   Average P-Value:          {std_pval:.4f}")
@@ -405,7 +407,7 @@ def compare_backtests(stock_symbol, analyze_regimes=True):
         print(f"   Average Return/Period:    {enh_results['actual_returns'].mean():.4f}")
         print(f"   Best Period Return:       {enh_results['actual_returns'].max():.4f}")
         print(f"   Worst Period Return:       {enh_results['actual_returns'].min():.4f}")
-    
+        
         print("\n📈 COMPARISON")
         print("="*80)
         
@@ -453,25 +455,25 @@ def compare_backtests(stock_symbol, analyze_regimes=True):
                 f"{std_total:.4f}",
                 f"{std_ann:.4f}",
                 f"{std_pval:.4f}",
-                f"{std_sig}/{len(std_results)}",
-                f"{std_zeros}/{len(std_results)}",
-                f"{std_results['actual_returns'].max():.4f}"
+                    f"{std_sig}/{len(std_results)}",
+                    f"{std_zeros}/{len(std_results)}",
+                    f"{std_results['actual_returns'].max():.4f}"
             ],
             'Enhanced': [
                 f"{enh_total:.4f}",
                 f"{enh_ann:.4f}",
                 f"{enh_pval:.4f}",
-                f"{enh_sig}/{len(enh_results)}",
-                f"{enh_zeros}/{len(enh_results)}",
-                f"{enh_results['actual_returns'].max():.4f}"
+                    f"{enh_sig}/{len(enh_results)}",
+                    f"{enh_zeros}/{len(enh_results)}",
+                    f"{enh_results['actual_returns'].max():.4f}"
             ],
             'Difference': [
                 f"{diff:+.4f}",
                 f"{ann_diff:+.4f}",
                 f"{enh_pval - std_pval:+.4f}",
-                f"{enh_sig - std_sig:+d}",
+                    f"{enh_sig - std_sig:+d}",
                 f"{enh_zeros - std_zeros:+d}",
-                f"{enh_results['actual_returns'].max() - std_results['actual_returns'].max():+.4f}"
+                    f"{enh_results['actual_returns'].max() - std_results['actual_returns'].max():+.4f}"
             ]
         })
         
