@@ -1,0 +1,14 @@
+{
+  "symbol": "SIEMENS.NS",
+  "current_price": 3225.300048828125,
+  "average_intrinsic_value": 824.5498052041598,
+  "discount_premium_pct": -74.43494271164785,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-20T14:31:50.604519",
+  "valuation_methods": {
+    "Graham Formula": 608.7232344609332,
+    "DCF Model (10-year)": 699.4090444686165,
+    "P/E Based (Fair P/E=20)": 950.5999418870896,
+    "P/B Based (Fair P/B=3.0)": 1039.4669999999999
+  }
+}

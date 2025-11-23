@@ -1,0 +1,36 @@
+{
+    "symbol": "TECHM.NS",
+    "timestamp": "2025-11-24T03:35:26.544667",
+    "data_file": "/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/data/TECHM.NS_intraday_1min_raw.csv",
+    "results": {
+        "Price Analysis": {
+            "success": true,
+            "output": "{'momentum_file': '/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/price_patterns/momentum_analysis.csv', 'reversal_file': '/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/price_patterns/reversal_patterns.csv', 'plots': ['/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/price_patterns/reversal_performance.png']}"
+        },
+        "Volume Analysis": {
+            "success": true,
+            "output": "{'spikes_file': '/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/volume_patterns/volume_spikes.csv', 'breakout_file': '/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/volume_patterns/volume_breakouts.csv', 'plots': ['/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/volume_patterns/volume_spike_scatter.png', '/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/volume_patterns/volume_breakout_dist.png']}"
+        },
+        "Time Analysis": {
+            "success": true,
+            "output": "{'hourly_stats': '/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/time_patterns/hourly_analysis.csv', 'day_stats': '/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/time_patterns/day_of_week_analysis.csv', 'session_stats': '/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/time_patterns/session_analysis.csv', 'plots': ['/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/time_patterns/hourly_patterns.png', '/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/time_patterns/day_of_week_patterns.png', '/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/time_patterns/time_heatmap.png', '/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/time_patterns/average_intraday_path.png']}"
+        },
+        "Smart Money": {
+            "success": true,
+            "output": "/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/smart_money"
+        },
+        "Indicator Combinations": {
+            "success": false,
+            "output": "Insufficient indicators"
+        },
+        "Report": {
+            "success": true,
+            "output": "/Users/av/Downloads/dev mode/ta/analysis_results/TECHM.NS/intraday_analysis/pattern_analysis/comprehensive_pattern_report.html"
+        }
+    },
+    "summary": {
+        "total_steps": 6,
+        "successful": 5,
+        "failed": 1
+    }
+}

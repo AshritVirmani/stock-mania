@@ -1,0 +1,149 @@
+================================================================================
+DHAN DATA SCRIPTS - SEQUENTIAL EXECUTION ORDER
+================================================================================
+
+All scripts that work with raw Dhan API data, numbered in execution order.
+
+================================================================================
+STEP 1: Fetch Raw Daily Data
+================================================================================
+Script: legacy_scripts/complete_setup.py
+Purpose: Fetches historical daily OHLCV data from Dhan API
+Command:
+    python3 legacy_scripts/complete_setup.py SYMBOL.NS
+Output: analysis_results/{SYMBOL}/data/{SYMBOL}_analysis.csv
+Note: Has toggle to choose Dhan API or Yahoo Finance
+
+================================================================================
+STEP 2: Fetch Raw Intraday Data (1-min or 5-min)
+================================================================================
+Script: legacy_scripts/fetch_intraday_data.py
+Purpose: Fetches 1-minute or 5-minute intraday OHLCV data from Dhan API
+Command:
+    python3 legacy_scripts/fetch_intraday_data.py SYMBOL.NS \
+        --from-date 2020-01-01 --to-date 2024-12-31 --interval 1
+Output: analysis_results/{SYMBOL}/intraday_analysis/data/{SYMBOL}_intraday_1min_raw.csv
+Note: Automatically handles 90-day API limit by chunking
+
+================================================================================
+STEP 3: Simple Price-Volume Pattern Analysis (Raw Data)
+================================================================================
+Script: legacy_scripts/simple_intraday_analysis.py
+Purpose: Detects behavioral patterns in raw OHLCV data using Z-scores
+Command:
+    python3 legacy_scripts/simple_intraday_analysis.py SYMBOL.NS \
+        --data-file analysis_results/{SYMBOL}/intraday_analysis/data/{SYMBOL}_intraday_1min_raw.csv
+Output: 
+    - processed_data.csv
+    - panic_sells.csv, fomo_buys.csv, icebergs.csv, stop_hunts.csv
+    - vol_divergence_bearish.csv, vol_divergence_bullish.csv
+    - exhaustion_bullish.csv, exhaustion_bearish.csv
+    - vol_confirmation_bullish.csv, vol_confirmation_bearish.csv
+    - accumulation.csv, distribution.csv
+    - pattern_summary.csv
+Detects: 13 behavioral patterns (Panic Sells, FOMO Buys, Iceberg, Stop Hunts, etc.)
+
+================================================================================
+STEP 4: Calculate Technical Indicators (Optional)
+================================================================================
+Script: legacy_scripts/calculate_intraday_indicators.py
+Purpose: Calculates 83+ TA indicators from raw intraday data
+Command:
+    python3 legacy_scripts/calculate_intraday_indicators.py \
+        --data-file analysis_results/{SYMBOL}/intraday_analysis/data/{SYMBOL}_intraday_1min_raw.csv \
+        --output-file analysis_results/{SYMBOL}/intraday_analysis/data/{SYMBOL}_intraday_1min_indicators.csv
+Output: {SYMBOL}_intraday_1min_indicators.csv (with 83+ indicators)
+Note: Only needed if you want to analyze TA indicator accuracy
+
+================================================================================
+STEP 5: Analyze TA Indicator Accuracy (Requires Step 4)
+================================================================================
+Script: legacy_scripts/intraday_ta_accuracy_analysis.py
+Purpose: Analyzes which TA indicators are most accurate for next candle prediction
+Command:
+    python3 legacy_scripts/intraday_ta_accuracy_analysis.py SYMBOL.NS \
+        --from-date 2020-01-01 --to-date 2024-12-31 --interval 1
+    OR
+    python3 legacy_scripts/intraday_ta_accuracy_analysis.py SYMBOL.NS \
+        --data-file analysis_results/{SYMBOL}/intraday_analysis/data/{SYMBOL}_intraday_1min_indicators.csv
+Output: 
+    - indicator_rankings.csv
+    - indicator_rankings.json
+    - Visualization charts
+Note: Requires indicators from Step 4
+
+================================================================================
+STEP 6: Comprehensive Pattern Discovery (Raw Data)
+================================================================================
+Script: legacy_scripts/intraday_pattern_discovery.py
+Purpose: Orchestrates all pattern analyses on raw data
+Command:
+    python3 legacy_scripts/intraday_pattern_discovery.py SYMBOL.NS \
+        --data-file analysis_results/{SYMBOL}/intraday_analysis/data/{SYMBOL}_intraday_1min_raw.csv
+Output:
+    - Time patterns analysis (hourly, day-of-week patterns)
+    - Volume patterns analysis (spikes, breakouts)
+    - Price patterns analysis (momentum, reversals)
+    - comprehensive_pattern_report.html (includes Step 3 results)
+Note: Automatically runs simple_intraday_analysis.py first, then other analyses
+
+================================================================================
+STEP 7: Fetch Options Data (Optional - Requires v2 API Access)
+================================================================================
+Script: legacy_scripts/fetch_options_data.py
+Purpose: Fetches historical expired options data with OI and IV
+Command:
+    python3 legacy_scripts/fetch_options_data.py NIFTY \
+        --strike-type ATM --option-type CE \
+        --from-date 2024-01-01 --to-date 2024-01-31 \
+        --instrument OPTIDX --expiry-flag MONTH --expiry-code 1 --interval 1
+Output: {SYMBOL}_{OPTION_TYPE}_{STRIKE_TYPE}_options_{FROM_DATE}_to_{TO_DATE}.csv
+Note: Currently returns 401 (requires v2 API access token with proper permissions)
+
+================================================================================
+STEP 8: Real-Time Market Depth (During Market Hours Only)
+================================================================================
+Script: legacy_scripts/market_depth_websocket.py
+Purpose: Streams real-time 20-level or 200-level market depth via WebSocket
+Command (20-level):
+    python3 legacy_scripts/market_depth_websocket.py \
+        --level 20 --instruments NSE_EQ:2 NSE_EQ:2885 \
+        --duration 60 --output-dir market_depth_data
+Command (200-level):
+    python3 legacy_scripts/market_depth_websocket.py \
+        --level 200 --instruments NSE_EQ:2 \
+        --duration 60 --output-dir market_depth_data
+Output: CSV files with bid/ask depth data
+Note: Only works during NSE market hours (9:15 AM - 3:30 PM IST, Mon-Fri)
+
+================================================================================
+SUPPORTING SCRIPTS (Called by main scripts)
+================================================================================
+
+These are called automatically by the main scripts above:
+
+- legacy_scripts/analyze_intraday_time_patterns.py (called by Step 6)
+- legacy_scripts/analyze_intraday_volume_patterns.py (called by Step 6)
+- legacy_scripts/analyze_intraday_price_patterns.py (called by Step 6)
+- legacy_scripts/analyze_indicator_combinations.py (called by Step 6, if indicators available)
+- legacy_scripts/generate_intraday_pattern_report.py (called by Step 6)
+- legacy_scripts/rank_intraday_indicators.py (called by Step 5)
+
+================================================================================
+QUICK START - MINIMAL WORKFLOW (Raw Data Only)
+================================================================================
+
+For quick analysis on raw data without indicators:
+
+1. Fetch data:
+   python3 legacy_scripts/fetch_intraday_data.py RELIANCE.NS \
+       --from-date 2020-01-01 --to-date 2024-12-31 --interval 1
+
+2. Analyze patterns:
+   python3 legacy_scripts/intraday_pattern_discovery.py RELIANCE.NS \
+       --data-file analysis_results/RELIANCE.NS/intraday_analysis/data/RELIANCE.NS_intraday_1min_raw.csv
+
+This runs Steps 2, 3, and 6 automatically.
+
+================================================================================
+

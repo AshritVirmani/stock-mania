@@ -1,15 +1,15 @@
 {
   "symbol": "RELIANCE.NS",
-  "current_price": 1518.9000244140625,
-  "average_intrinsic_value": 754.9414549029693,
-  "discount_premium_pct": -50.296830418828996,
+  "current_price": 1546.5999755859375,
+  "average_intrinsic_value": 717.3668237104387,
+  "discount_premium_pct": -53.61652430916013,
   "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
-  "timestamp": "2025-11-20T02:01:50.691411",
+  "timestamp": "2025-11-23T13:22:05.889552",
   "valuation_methods": {
-    "Graham Formula": 946.0899133767606,
-    "DCF Model": 346.4893641859535,
-    "P/E Based (Fair P/E=15)": 920.6999981415441,
+    "Graham Formula": 946.2440323513583,
+    "DCF Model (10-year)": 342.1701028487762,
+    "P/E Based (Fair P/E=12)": 736.7999907511436,
     "P/B Based (Fair P/B=1.5)": 972.1800000000001,
-    "PEG Based": 589.2479988105882
+    "PEG Based": 589.4399926009148
   }
 }

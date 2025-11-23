@@ -1,0 +1,74 @@
+{
+  "timestamp": "2025-11-23T13:22:36.311049",
+  "symbol": "TATAINVEST.NS",
+  "basic_metrics": {
+    "best_bid": 1500.0,
+    "best_ask": 1500.0,
+    "spread": 0.0,
+    "mid_price": 1500.0,
+    "total_bid_volume": 62993,
+    "total_ask_volume": 50389,
+    "total_depth": 113382
+  },
+  "depth_metrics": {
+    "bid_ask_imbalance": 0.11116402956377555,
+    "liquidity_score": 65.85302909790437,
+    "large_order_ratio": 0.11326312818613184
+  },
+  "support_resistance": {
+    "support_levels": [
+      1500.0,
+      1499.95,
+      1499.9,
+      1499.85,
+      1499.8
+    ],
+    "resistance_levels": [
+      1500.0,
+      1500.05,
+      1500.1,
+      1500.15,
+      1500.2
+    ]
+  },
+  "whale_detection": {
+    "iceberg_buy": false,
+    "iceberg_sell": false,
+    "accumulation": {
+      "accumulation_detected": false,
+      "accumulation_score": 2,
+      "signals": [
+        "deep_order_book"
+      ],
+      "imbalance": 0.11116402956377555,
+      "large_order_ratio": 0.11326312818613184,
+      "depth": 113382
+    },
+    "distribution": {
+      "distribution_detected": false,
+      "distribution_score": 0,
+      "signals": [],
+      "imbalance": 0.11116402956377555,
+      "large_order_ratio": 0.11326312818613184
+    }
+  },
+  "regimes": {
+    "liquidity": {
+      "regime": "MODERATE_LIQUIDITY",
+      "description": "Moderate depth, acceptable spread",
+      "liquidity_score": 65.85302909790437,
+      "depth": 113382,
+      "spread_pct": 0.0
+    },
+    "whale": {
+      "regime": "NEUTRAL",
+      "description": "Balanced order book, no strong whale signals",
+      "accumulation_score": 2,
+      "distribution_score": 0,
+      "imbalance": 0.11116402956377555
+    }
+  },
+  "signals": [
+    "\u26aa NEUTRAL: No strong depth-based signals"
+  ]
+}

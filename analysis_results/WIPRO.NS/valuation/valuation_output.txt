@@ -1,0 +1,82 @@
+
+================================================================================
+💰 INTRINSIC VALUE ANALYSIS: WIPRO.NS
+================================================================================
+
+📊 Fetching fundamental data for WIPRO.NS...
+   ⚠️  Using default Risk-Free Rate: 7.1% (could not fetch live data)
+⚠️  Warning: Dividend yield seems high (450.00%)
+   This might be a data error. Recalculating from dividend rate...
+   Recalculated dividend yield: 4.50%
+⚠️  Warning: Debt-to-Equity appears to be percentage (18.74%)
+   Converted to ratio: 0.19
+✅ Data fetched successfully
+
+📈 Current Market Price: ₹244.49
+📋 Company: Wipro Limited
+🏢 Sector: Technology
+🏭 Industry: Information Technology Services
+
+ℹ️  Using Sector Benchmarks: Fair P/E=25, Fair P/B=5.0
+
+--------------------------------------------------------------------------------
+🔍 CALCULATING INTRINSIC VALUE (Multiple Methods)
+--------------------------------------------------------------------------------
+1️⃣  Modified Graham:        ₹115.68 (-52.7%)
+2️⃣  DCF Model (10-year):      ₹125.66 (-48.6%)
+3️⃣  P/E Based (Fair P/E=25):   ₹321.34 (+31.4%)
+4️⃣  P/B Based (Fair P/B=5.0):  ₹410.96 (+68.1%)
+5️⃣  PEG Based:                ₹12.85 (-94.7%)
+
+--------------------------------------------------------------------------------
+📊 SUMMARY
+--------------------------------------------------------------------------------
+Average Intrinsic Value:     ₹197.30
+Current Market Price:        ₹244.49
+Discount/Premium:            -19.3%
+
+--------------------------------------------------------------------------------
+🎯 VALUATION ASSESSMENT
+--------------------------------------------------------------------------------
+🟠 MODERATELY OVERVALUED
+Recommendation: Caution
+
+--------------------------------------------------------------------------------
+📋 KEY METRICS
+--------------------------------------------------------------------------------
+Trailing P/E:                19.02
+Forward P/E:                 9.68
+Price-to-Book:               2.98
+Current EPS:                 ₹12.85
+Book Value per Share:        ₹82.19
+Dividend Yield:              4.50%
+Profit Margin:               15.06%
+Debt-to-Equity:              0.19
+
+--------------------------------------------------------------------------------
+💡 IMPLIED EPS ANALYSIS
+--------------------------------------------------------------------------------
+What EPS would justify the current price at different P/E ratios?
+
+P/E Ratio       Implied EPS          vs Current EPS            Gap            
+---------------------------------------------------------------------------
+P/E 10         ₹24.45              ₹12.85                   +11.60 (+90.2%)
+P/E 15         ₹16.30              ₹12.85                   +3.45 (+26.8%)
+P/E 20         ₹12.22              ₹12.85                   -0.63 (-4.9%)  ⭐
+P/E 25         ₹9.78               ₹12.85                   -3.07 (-23.9%)
+P/E 30         ₹8.15               ₹12.85                   -4.70 (-36.6%)
+
+📊 Current EPS (₹12.85) implies P/E of 19.02
+
+💭 Interpretation:
+   Market is pricing the stock at approximately P/E 20
+
+💾 Valuation results saved to: analysis_results/WIPRO.NS/valuation/intrinsic_value.json
+
+================================================================================
+
+
+
+--- ERRORS/WARNINGS ---
+HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: ^IGSEC"}}}
+$^IGSEC: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")

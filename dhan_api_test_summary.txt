@@ -1,0 +1,49 @@
+================================================================================
+DHAN API TESTING SUMMARY
+================================================================================
+
+✅ WORKING METHODS:
+-------------------
+1. historical_daily_data() - ✅ Works - Fetches daily OHLCV data
+2. intraday_minute_data() - ✅ Works - Fetches minute-level data
+3. quote_data() - ✅ Method exists, returns empty data (may need market hours)
+
+❌ NOT FOUND:
+------------
+- get_market_depth()
+- market_depth()
+- get_order_book()
+- order_book()
+- Any WebSocket/streaming methods for real-time order book
+
+📊 AVAILABLE DATA METHODS:
+--------------------------
+- historical_daily_data: Daily OHLCV data ✅
+- intraday_minute_data: Minute-level OHLCV data ✅
+- quote_data: Quote data (empty response - may need market hours) ⚠️
+- ticker_data: Ticker data (needs correct format)
+- ohlc_data: OHLC data (needs correct format)
+
+💡 FINDINGS:
+-----------
+1. Historical data fetching works perfectly
+2. Market depth/order book is NOT available through standard REST API methods
+3. Order book data likely requires:
+   - WebSocket connection (not available in dhanhq library)
+   - Different API endpoint
+   - Market hours (quote_data returns empty when market closed)
+
+🎯 RECOMMENDATION:
+-----------------
+For 20-level market depth data, you may need to:
+1. Check Dhan API documentation for WebSocket endpoints
+2. Use a different API provider for order book data
+3. Use sample/simulated data for backtesting (current implementation)
+4. Check if quote_data returns order book during market hours
+
+Current implementation uses sample data as fallback, which works for:
+- Strategy development
+- Backtesting with depth-based execution modeling
+- Whale detection algorithms
+- Regime classification
+

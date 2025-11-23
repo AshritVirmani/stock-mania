@@ -1,0 +1,63 @@
+{
+  "timestamp": "2025-11-23T13:37:56.854383",
+  "symbol": "RELIANCE.NS",
+  "api_status": "INVALID_DATA",
+  "data_source": "SAMPLE_FALLBACK",
+  "_error": "Market depth API method not found in dhanhq library",
+  "basic_metrics": {
+    "best_bid": 0.0,
+    "best_ask": 0.0,
+    "spread": 0.0,
+    "mid_price": 0.0,
+    "total_bid_volume": 0,
+    "total_ask_volume": 0,
+    "total_depth": 0
+  },
+  "depth_metrics": {
+    "bid_ask_imbalance": 0.0,
+    "liquidity_score": 0.0,
+    "large_order_ratio": 0.0
+  },
+  "support_resistance": {
+    "support_levels": [],
+    "resistance_levels": []
+  },
+  "whale_detection": {
+    "iceberg_buy": false,
+    "iceberg_sell": false,
+    "accumulation": {
+      "accumulation_detected": false,
+      "accumulation_score": 0,
+      "signals": [],
+      "imbalance": 0.0,
+      "large_order_ratio": 0.0,
+      "depth": 0
+    },
+    "distribution": {
+      "distribution_detected": false,
+      "distribution_score": 0,
+      "signals": [],
+      "imbalance": 0.0,
+      "large_order_ratio": 0.0
+    }
+  },
+  "regimes": {
+    "liquidity": {
+      "regime": "ILLIQUID",
+      "description": "Very shallow order book, very wide spread",
+      "liquidity_score": 0.0,
+      "depth": 0,
+      "spread_pct": 100
+    },
+    "whale": {
+      "regime": "NEUTRAL",
+      "description": "Balanced order book, no strong whale signals",
+      "accumulation_score": 0,
+      "distribution_score": 0,
+      "imbalance": 0.0
+    }
+  },
+  "signals": [
+    "\u26d4 AVOID: Illiquid market - high slippage risk"
+  ]
+}

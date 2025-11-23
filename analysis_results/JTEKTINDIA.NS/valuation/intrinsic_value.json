@@ -1,0 +1,15 @@
+{
+  "symbol": "JTEKTINDIA.NS",
+  "current_price": 148.88999938964844,
+  "average_intrinsic_value": 66.49627963812803,
+  "discount_premium_pct": -55.338652756585894,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-21T22:43:49.176028",
+  "valuation_methods": {
+    "Graham Formula": 49.72950428574687,
+    "DCF Model (10-year)": 70.60189400182256,
+    "P/E Based (Fair P/E=20)": 53.599999924274,
+    "P/B Based (Fair P/B=3.5)": 143.542,
+    "PEG Based": 15.007999978796722
+  }
+}

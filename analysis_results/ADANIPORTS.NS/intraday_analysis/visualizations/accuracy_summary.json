@@ -1,0 +1,115 @@
+{
+  "symbol": "ADANIPORTS.NS",
+  "interval": "1min",
+  "total_indicators": 28,
+  "statistics": {
+    "accuracy": {
+      "mean": 0.0,
+      "median": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "precision": {
+      "mean": 0.0,
+      "median": 0.0
+    },
+    "recall": {
+      "mean": 0.0,
+      "median": 0.0
+    },
+    "f1_score": {
+      "mean": 0.0,
+      "median": 0.0
+    },
+    "total_signals": {
+      "mean": 0.0,
+      "median": 0.0,
+      "sum": 0
+    }
+  },
+  "top_10_indicators": [
+    {
+      "indicator": "RSI",
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_signals": 0
+    },
+    {
+      "indicator": "Stoch_K",
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_signals": 0
+    },
+    {
+      "indicator": "Return_Lag_5",
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_signals": 0
+    },
+    {
+      "indicator": "Vol_Lag_3",
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_signals": 0
+    },
+    {
+      "indicator": "Return_Lag_3",
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_signals": 0
+    },
+    {
+      "indicator": "Vol_Lag_2",
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_signals": 0
+    },
+    {
+      "indicator": "Return_Lag_2",
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_signals": 0
+    },
+    {
+      "indicator": "Vol_Lag_1",
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_signals": 0
+    },
+    {
+      "indicator": "Return_Lag_1",
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_signals": 0
+    },
+    {
+      "indicator": "ATR_15m",
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_signals": 0
+    }
+  ],
+  "indicators_above_random": 0,
+  "indicators_below_random": 28
+}

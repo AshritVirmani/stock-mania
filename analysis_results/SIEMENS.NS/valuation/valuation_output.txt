@@ -1,0 +1,84 @@
+
+================================================================================
+💰 INTRINSIC VALUE ANALYSIS: SIEMENS.NS
+================================================================================
+
+📊 Fetching fundamental data for SIEMENS.NS...
+   ⚠️  Using default Risk-Free Rate: 7.1% (could not fetch live data)
+⚠️  Warning: Dividend yield seems high (37.00%)
+   This might be a data error. Recalculating from dividend rate...
+   Recalculated dividend yield: 0.37%
+✅ Data fetched successfully
+
+📈 Current Market Price: ₹3225.30
+📋 Company: Siemens Limited
+🏢 Sector: Industrials
+🏭 Industry: Specialty Industrial Machinery
+
+ℹ️  Using Sector Benchmarks: Fair P/E=20, Fair P/B=3.0
+
+--------------------------------------------------------------------------------
+🔍 CALCULATING INTRINSIC VALUE (Multiple Methods)
+--------------------------------------------------------------------------------
+1️⃣  Graham Formula:        ₹608.72 (-81.1%)
+   ⚠️  Using EPS-based cash flow proxy (FCF unavailable)
+   📝 DCF assumptions: EPS-based proxy (80% of earnings), Growth: 10.0%, Discount: 12.1%
+2️⃣  DCF Model (10-year):      ₹699.41 (-78.3%)
+3️⃣  P/E Based (Fair P/E=20):   ₹950.60 (-70.5%)
+4️⃣  P/B Based (Fair P/B=3.0):  ₹1039.47 (-67.8%)
+
+--------------------------------------------------------------------------------
+📊 SUMMARY
+--------------------------------------------------------------------------------
+Average Intrinsic Value:     ₹824.55
+Current Market Price:        ₹3225.30
+Discount/Premium:            -74.4%
+
+--------------------------------------------------------------------------------
+🎯 VALUATION ASSESSMENT
+--------------------------------------------------------------------------------
+🔴 SIGNIFICANTLY OVERVALUED
+Recommendation: Consider Selling
+
+💡 Note: Market may be pricing in future growth/margin expansion
+   Consider: Earnings growth trajectory, sector trends, competitive position
+
+--------------------------------------------------------------------------------
+📋 KEY METRICS
+--------------------------------------------------------------------------------
+Trailing P/E:                67.86
+Forward P/E:                 37.83
+Price-to-Book:               9.31
+Current EPS:                 ₹47.53
+Book Value per Share:        ₹346.49
+Dividend Yield:              0.37%
+Profit Margin:               10.74%
+Debt-to-Equity:              1.10
+
+--------------------------------------------------------------------------------
+💡 IMPLIED EPS ANALYSIS
+--------------------------------------------------------------------------------
+What EPS would justify the current price at different P/E ratios?
+
+P/E Ratio       Implied EPS          vs Current EPS            Gap            
+---------------------------------------------------------------------------
+P/E 10         ₹322.53             ₹47.53                   +275.00 (+578.6%)
+P/E 15         ₹215.02             ₹47.53                   +167.49 (+352.4%)
+P/E 20         ₹161.27             ₹47.53                   +113.74 (+239.3%)
+P/E 25         ₹129.01             ₹47.53                   +81.48 (+171.4%)
+P/E 30         ₹107.51             ₹47.53                   +59.98 (+126.2%)
+
+📊 Current EPS (₹47.53) implies P/E of 67.86
+
+💭 Interpretation:
+   Market is pricing at premium P/E 67.9 (growth expectations)
+
+💾 Valuation results saved to: analysis_results/SIEMENS.NS/valuation/intrinsic_value.json
+
+================================================================================
+
+
+
+--- ERRORS/WARNINGS ---
+HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: ^IGSEC"}}}
+$^IGSEC: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")

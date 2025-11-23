@@ -1,0 +1,15 @@
+{
+  "symbol": "ADANIPORTS.NS",
+  "current_price": 1479.800048828125,
+  "average_intrinsic_value": 852.1566273685282,
+  "discount_premium_pct": -42.41406951950276,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-24T03:24:02.925261",
+  "valuation_methods": {
+    "Graham Formula": 621.8560281159147,
+    "DCF Model (10-year)": 100.14005300179468,
+    "P/E Based (Fair P/E=20)": 1107.1741213269352,
+    "P/B Based (Fair P/B=3.0)": 931.392,
+    "PEG Based": 1500.220934397997
+  }
+}

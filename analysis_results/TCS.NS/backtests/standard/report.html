@@ -1,0 +1,77 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Hedge Fund Grade Report: TCS.NS</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0 auto; max-width: 1200px; padding: 20px; background-color: #f9f9f9; }
+            h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+            h2 { color: #34495e; margin-top: 30px; }
+            .container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+            .summary-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+            .summary-table th, .summary-table td { border: 1px solid #e0e0e0; padding: 12px; text-align: left; }
+            .summary-table th { background-color: #f2f6fc; font-weight: 600; color: #2c3e50; }
+            .plot-container { text-align: center; margin: 20px 0; }
+            img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; }
+            .caption { font-style: italic; color: #666; margin-top: 8px; }
+            .metric-box { background-color: #e8f4f8; border-left: 4px solid #3498db; padding: 15px; margin: 10px 0; }
+        </style>
+    </head>
+    <body>
+        <h1>Donchian Strategy Audit: TCS.NS</h1>
+        
+        <div class="container">
+            <h2>Executive Summary</h2>
+        <table border="1" class="dataframe summary-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Stock</th>
+      <th>Total Log Return</th>
+      <th>Annualized Return</th>
+      <th>Avg P-Value</th>
+      <th>Significant Periods (p&lt;0.05)</th>
+      <th>MCPT Iterations</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TCS.NS</td>
+      <td>-1.9909</td>
+      <td>-9.51%</td>
+      <td>0.6978</td>
+      <td>0/42</td>
+      <td>1000</td>
+    </tr>
+  </tbody>
+</table>
+            <div class="metric-box">
+                <strong>Methodology:</strong> Walk-Forward Optimization (730 day train / 182 day test).
+                <br>
+                <strong>Validation:</strong> Monte Carlo Permutation Test (1000 iterations per period).
+            </div>
+        </div>
+        <div class="container">
+            <h2>1. Alpha Verification (The "Money Plot")</h2>
+            <div class="plot-container">
+                <img src="actual_vs_permuted.png" alt="Actual vs Permuted">
+                <div class="caption">Red line = Your Strategy. Grey lines = Random Luck. If Red is above Grey, you have Alpha.</div>
+            </div>
+        </div>
+        <div class="container">
+            <h2>2. Equity Curve</h2>
+            <div class="plot-container">
+        <img src="equity_curve.png" alt="Equity Curve">
+                <div class="caption">Cumulative Log Returns over the entire test history.</div>
+            </div>
+        </div>
+        <div class="container">
+            <h2>3. Statistical Robustness</h2>
+            <div class="plot-container">
+                <img src="p_value_dist.png" alt="P-Value Distribution">
+                <div class="caption">Distribution of P-Values. A left-skewed histogram (bars stacked near 0.0) indicates consistent statistical significance.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+    

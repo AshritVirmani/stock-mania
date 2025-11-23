@@ -1,0 +1,85 @@
+
+================================================================================
+💰 INTRINSIC VALUE ANALYSIS: MRF.NS
+================================================================================
+
+📊 Fetching fundamental data for MRF.NS...
+   ⚠️  Using default Risk-Free Rate: 7.1% (could not fetch live data)
+⚠️  Warning: Dividend yield seems high (16.00%)
+   This might be a data error. Recalculating from dividend rate...
+   Recalculated dividend yield: 0.16%
+⚠️  Warning: Debt-to-Equity appears to be percentage (18.68%)
+   Converted to ratio: 0.19
+✅ Data fetched successfully
+
+📈 Current Market Price: ₹152205.00
+📋 Company: MRF Limited
+🏢 Sector: Consumer Cyclical
+🏭 Industry: Auto Parts
+
+ℹ️  Using Sector Benchmarks: Fair P/E=20, Fair P/B=3.5
+
+--------------------------------------------------------------------------------
+🔍 CALCULATING INTRINSIC VALUE (Multiple Methods)
+--------------------------------------------------------------------------------
+1️⃣  Graham Formula:        ₹67139.82 (-55.9%)
+2️⃣  DCF Model (10-year):      ₹31157.90 (-79.5%)
+3️⃣  P/E Based (Fair P/E=20):   ₹87412.40 (-42.6%)
+4️⃣  P/B Based (Fair P/B=3.5):  ₹160436.36 (+5.4%)
+5️⃣  PEG Based:                ₹51136.26 (-66.4%)
+
+--------------------------------------------------------------------------------
+📊 SUMMARY
+--------------------------------------------------------------------------------
+Average Intrinsic Value:     ₹79456.55
+Current Market Price:        ₹152205.00
+Discount/Premium:            -47.8%
+
+--------------------------------------------------------------------------------
+🎯 VALUATION ASSESSMENT
+--------------------------------------------------------------------------------
+🔴 SIGNIFICANTLY OVERVALUED
+Recommendation: Consider Selling
+
+💡 Note: Market may be pricing in future growth/margin expansion
+   Consider: Earnings growth trajectory, sector trends, competitive position
+
+--------------------------------------------------------------------------------
+📋 KEY METRICS
+--------------------------------------------------------------------------------
+Trailing P/E:                34.82
+Forward P/E:                 28.73
+Price-to-Book:               3.32
+Current EPS:                 ₹4370.62
+Book Value per Share:        ₹45838.96
+Dividend Yield:              0.16%
+Profit Margin:               6.36%
+Debt-to-Equity:              0.19
+
+--------------------------------------------------------------------------------
+💡 IMPLIED EPS ANALYSIS
+--------------------------------------------------------------------------------
+What EPS would justify the current price at different P/E ratios?
+
+P/E Ratio       Implied EPS          vs Current EPS            Gap            
+---------------------------------------------------------------------------
+P/E 10         ₹15220.50           ₹4370.62                 +10849.88 (+248.2%)
+P/E 15         ₹10147.00           ₹4370.62                 +5776.38 (+132.2%)
+P/E 20         ₹7610.25            ₹4370.62                 +3239.63 (+74.1%)
+P/E 25         ₹6088.20            ₹4370.62                 +1717.58 (+39.3%)
+P/E 30         ₹5073.50            ₹4370.62                 +702.88 (+16.1%)
+
+📊 Current EPS (₹4370.62) implies P/E of 34.82
+
+💭 Interpretation:
+   Market is pricing at premium P/E 34.8 (growth expectations)
+
+💾 Valuation results saved to: analysis_results/MRF.NS/valuation/intrinsic_value.json
+
+================================================================================
+
+
+
+--- ERRORS/WARNINGS ---
+HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: ^IGSEC"}}}
+$^IGSEC: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")

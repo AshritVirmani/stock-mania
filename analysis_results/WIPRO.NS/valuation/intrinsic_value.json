@@ -1,0 +1,15 @@
+{
+  "symbol": "WIPRO.NS",
+  "current_price": 244.49000549316406,
+  "average_intrinsic_value": 197.30036572182513,
+  "discount_premium_pct": -19.30125514789534,
+  "assessment": "\ud83d\udfe0 MODERATELY OVERVALUED",
+  "timestamp": "2025-11-24T03:22:26.669253",
+  "valuation_methods": {
+    "Modified Graham": 115.683219187811,
+    "DCF Model (10-year)": 125.65764287874939,
+    "P/E Based (Fair P/E=25)": 321.3422755216973,
+    "P/B Based (Fair P/B=5.0)": 410.965,
+    "PEG Based": 12.85369102086789
+  }
+}

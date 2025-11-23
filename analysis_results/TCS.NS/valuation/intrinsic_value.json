@@ -1,0 +1,15 @@
+{
+  "symbol": "TCS.NS",
+  "current_price": 3150.60009765625,
+  "average_intrinsic_value": 1520.128463659957,
+  "discount_premium_pct": -51.75114528845506,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-24T03:20:42.732241",
+  "valuation_methods": {
+    "Modified Graham": 1340.3073176013709,
+    "DCF Model (10-year)": 1179.1162063436998,
+    "P/E Based (Fair P/E=25)": 3419.1513204116604,
+    "P/B Based (Fair P/B=5.0)": 1470.5950000000003,
+    "PEG Based": 191.472473943053
+  }
+}

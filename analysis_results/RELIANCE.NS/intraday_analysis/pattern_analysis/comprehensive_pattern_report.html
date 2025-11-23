@@ -1,0 +1,730 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>RELIANCE.NS - Intraday Pattern Analysis</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; color: #333; background: #f5f5f5; }
+            .container { max-width: 1400px; margin: 0 auto; background: white; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+            h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+            h2 { color: #2980b9; margin-top: 30px; border-left: 4px solid #3498db; padding-left: 10px; }
+            h3 { color: #34495e; margin-top: 20px; }
+            .section { margin-bottom: 40px; background: #f9f9f9; padding: 20px; border-radius: 5px; border: 1px solid #ddd; }
+            .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-top: 15px; }
+            img { max-width: 100%; height: auto; border: 1px solid #ddd; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); border-radius: 3px; }
+            table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+            th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
+            th { background-color: #3498db; color: white; font-weight: bold; }
+            tr:hover { background-color: #f5f5f5; }
+            .pattern-count { display: inline-block; background: #3498db; color: white; padding: 5px 10px; border-radius: 3px; margin: 5px; }
+            .insight-box { background: #e8f4f8; border-left: 4px solid #3498db; padding: 15px; margin: 15px 0; }
+            ul { line-height: 1.8; }
+            li { margin: 5px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+        <h1>RELIANCE.NS - Intraday Pattern Discovery Report</h1>
+        <p>Comprehensive analysis of intraday data to identify time, volume, and price patterns using raw OHLCV data.</p>
+    
+        <div class="section">
+            <h2>🎯 Price-Volume Behavioral Patterns</h2>
+            <p>Analysis of raw OHLCV data to detect specific behavioral patterns using mathematical normalization (Z-scores).</p>
+        <div class="insight-box"><h3>Pattern Summary</h3><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Pattern</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Panic Sells</td>
+      <td>742</td>
+    </tr>
+    <tr>
+      <td>FOMO Buys</td>
+      <td>789</td>
+    </tr>
+    <tr>
+      <td>Iceberg/Absorption</td>
+      <td>923</td>
+    </tr>
+    <tr>
+      <td>Bullish Stop Hunts</td>
+      <td>1966</td>
+    </tr>
+    <tr>
+      <td>Bearish Stop Hunts</td>
+      <td>1760</td>
+    </tr>
+    <tr>
+      <td>Vol Divergence Bearish</td>
+      <td>388</td>
+    </tr>
+    <tr>
+      <td>Vol Divergence Bullish</td>
+      <td>347</td>
+    </tr>
+    <tr>
+      <td>Exhaustion Bullish</td>
+      <td>99</td>
+    </tr>
+    <tr>
+      <td>Exhaustion Bearish</td>
+      <td>101</td>
+    </tr>
+    <tr>
+      <td>Vol Confirmation Bullish</td>
+      <td>615</td>
+    </tr>
+    <tr>
+      <td>Vol Confirmation Bearish</td>
+      <td>485</td>
+    </tr>
+    <tr>
+      <td>Accumulation</td>
+      <td>44</td>
+    </tr>
+    <tr>
+      <td>Distribution</td>
+      <td>20</td>
+    </tr>
+  </tbody>
+</table></div><div class="grid"><div><h4>Panic Sells</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2021-12-24 10:29:00</th>
+      <td>1070.65</td>
+      <td>17832.0</td>
+      <td>4.248529</td>
+      <td>-0.002376</td>
+    </tr>
+    <tr>
+      <th>2021-08-16 10:29:00</th>
+      <td>981.05</td>
+      <td>30514.0</td>
+      <td>4.248529</td>
+      <td>-0.002034</td>
+    </tr>
+    <tr>
+      <th>2022-02-14 10:29:00</th>
+      <td>1054.75</td>
+      <td>33770.0</td>
+      <td>4.248529</td>
+      <td>-0.002836</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>FOMO Buys</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2021-12-30 10:29:00</th>
+      <td>1069.25</td>
+      <td>58682.0</td>
+      <td>4.248529</td>
+      <td>0.002109</td>
+    </tr>
+    <tr>
+      <th>2021-12-28 10:28:00</th>
+      <td>1087.35</td>
+      <td>61788.0</td>
+      <td>4.248529</td>
+      <td>0.002351</td>
+    </tr>
+    <tr>
+      <th>2021-12-16 10:29:00</th>
+      <td>1091.85</td>
+      <td>73868.0</td>
+      <td>4.248529</td>
+      <td>0.004185</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Iceberg/Absorption</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2022-08-08 07:31:00</th>
+      <td>1164.65</td>
+      <td>5737152.0</td>
+      <td>4.248382</td>
+      <td>0.000043</td>
+    </tr>
+    <tr>
+      <th>2021-12-07 05:48:00</th>
+      <td>1084.40</td>
+      <td>569114.0</td>
+      <td>4.244303</td>
+      <td>-0.000138</td>
+    </tr>
+    <tr>
+      <th>2023-03-23 05:45:00</th>
+      <td>1017.75</td>
+      <td>773298.0</td>
+      <td>4.244136</td>
+      <td>0.000197</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Bullish Stop Hunts</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2021-11-04 12:45:00</th>
+      <td>1128.35</td>
+      <td>85020.0</td>
+      <td>4.248529</td>
+      <td>0.000710</td>
+    </tr>
+    <tr>
+      <th>2022-03-31 03:45:00</th>
+      <td>1205.95</td>
+      <td>327350.0</td>
+      <td>4.248529</td>
+      <td>0.000498</td>
+    </tr>
+    <tr>
+      <th>2021-09-02 09:17:09</th>
+      <td>1040.30</td>
+      <td>4060782.0</td>
+      <td>4.248529</td>
+      <td>0.006677</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Bearish Stop Hunts</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2023-04-10 07:50:00</th>
+      <td>1058.95</td>
+      <td>1127920.0</td>
+      <td>4.247699</td>
+      <td>-0.000094</td>
+    </tr>
+    <tr>
+      <th>2022-03-22 03:45:00</th>
+      <td>1112.05</td>
+      <td>2696202.0</td>
+      <td>4.247485</td>
+      <td>-0.000584</td>
+    </tr>
+    <tr>
+      <th>2024-09-20 06:50:00</th>
+      <td>1487.90</td>
+      <td>805218.0</td>
+      <td>4.246696</td>
+      <td>-0.000067</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Volume Divergence Bearish</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2021-11-30 10:00:00</th>
+      <td>1087.95</td>
+      <td>0.0</td>
+      <td>-2.511002</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>2021-11-16 09:59:00</th>
+      <td>1138.85</td>
+      <td>0.0</td>
+      <td>-2.499206</td>
+      <td>0.008769</td>
+    </tr>
+    <tr>
+      <th>2021-05-27 09:59:00</th>
+      <td>900.10</td>
+      <td>116366.0</td>
+      <td>-2.234965</td>
+      <td>-0.000943</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Volume Divergence Bullish</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2021-08-07 08:23:01</th>
+      <td>1146.6</td>
+      <td>-32653634.0</td>
+      <td>-4.248393</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>2025-06-23 03:45:00</th>
+      <td>1456.5</td>
+      <td>167177.0</td>
+      <td>-2.386088</td>
+      <td>-0.005191</td>
+    </tr>
+    <tr>
+      <th>2025-06-23 03:46:00</th>
+      <td>1455.4</td>
+      <td>50407.0</td>
+      <td>-2.348104</td>
+      <td>-0.000755</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Exhaustion Bullish</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2021-11-04 12:45:00</th>
+      <td>1128.35</td>
+      <td>85020.0</td>
+      <td>4.248529</td>
+      <td>0.000710</td>
+    </tr>
+    <tr>
+      <th>2022-08-08 07:31:00</th>
+      <td>1164.65</td>
+      <td>5737152.0</td>
+      <td>4.248382</td>
+      <td>0.000043</td>
+    </tr>
+    <tr>
+      <th>2023-10-10 04:13:00</th>
+      <td>1155.45</td>
+      <td>2092396.0</td>
+      <td>4.247141</td>
+      <td>0.000173</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Exhaustion Bearish</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2023-04-10 07:50:00</th>
+      <td>1058.95</td>
+      <td>1127920.0</td>
+      <td>4.247699</td>
+      <td>-0.000094</td>
+    </tr>
+    <tr>
+      <th>2024-09-20 06:50:00</th>
+      <td>1487.90</td>
+      <td>805218.0</td>
+      <td>4.246696</td>
+      <td>-0.000067</td>
+    </tr>
+    <tr>
+      <th>2023-08-17 06:12:00</th>
+      <td>1280.25</td>
+      <td>1043416.0</td>
+      <td>4.245169</td>
+      <td>-0.000195</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Volume Confirmation Bullish</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2021-12-16 10:29:00</th>
+      <td>1091.85</td>
+      <td>73868.0</td>
+      <td>4.248529</td>
+      <td>0.004185</td>
+    </tr>
+    <tr>
+      <th>2021-11-25 10:29:00</th>
+      <td>1131.20</td>
+      <td>87728.0</td>
+      <td>4.248529</td>
+      <td>0.003237</td>
+    </tr>
+    <tr>
+      <th>2021-10-21 10:27:00</th>
+      <td>1191.80</td>
+      <td>128694.0</td>
+      <td>4.248529</td>
+      <td>0.004763</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Volume Confirmation Bearish</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2021-11-16 10:29:00</th>
+      <td>1129.50</td>
+      <td>53570.0</td>
+      <td>4.248529</td>
+      <td>-0.008210</td>
+    </tr>
+    <tr>
+      <th>2021-09-30 10:29:00</th>
+      <td>1135.75</td>
+      <td>84808.0</td>
+      <td>4.248529</td>
+      <td>-0.003247</td>
+    </tr>
+    <tr>
+      <th>2022-01-05 10:28:00</th>
+      <td>1113.50</td>
+      <td>102094.0</td>
+      <td>4.248529</td>
+      <td>-0.003133</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Accumulation</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2021-01-19 03:46:00</th>
+      <td>908.65</td>
+      <td>804940.0</td>
+      <td>2.407601</td>
+      <td>0.001488</td>
+    </tr>
+    <tr>
+      <th>2021-08-07 06:24:01</th>
+      <td>1086.60</td>
+      <td>1113748.0</td>
+      <td>2.311730</td>
+      <td>0.000875</td>
+    </tr>
+    <tr>
+      <th>2022-05-25 03:46:00</th>
+      <td>1198.15</td>
+      <td>148522.0</td>
+      <td>2.284064</td>
+      <td>0.001881</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Distribution</h4><p><strong>Count:</strong> 10</p><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Vol_Z</th>
+      <th>Returns</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2021-11-17 03:46:00</th>
+      <td>1124.05</td>
+      <td>188546.0</td>
+      <td>2.342496</td>
+      <td>-0.000711</td>
+    </tr>
+    <tr>
+      <th>2025-04-04 03:47:00</th>
+      <td>1235.70</td>
+      <td>227118.0</td>
+      <td>2.116151</td>
+      <td>-0.001212</td>
+    </tr>
+    <tr>
+      <th>2024-11-08 03:46:00</th>
+      <td>1290.55</td>
+      <td>233103.0</td>
+      <td>2.089119</td>
+      <td>-0.000426</td>
+    </tr>
+  </tbody>
+</table></div></div></div>
+            <div class="section">
+                <h2>⏰ Time-Based Patterns</h2>
+                <p>Analysis of returns, volatility, and volume patterns across different times of day and days of week.</p>
+                <div class="grid">
+        <div class="insight-box"><h3>Key Insights</h3><ul><li>Best Hour: 3 (87.16% cumulative return)</li><li>Worst Hour: 4 (-43.22% cumulative return)</li><li>Highest Volume Hour: 14 (157,399 avg volume)</li></ul></div><div><h4>Hourly Patterns</h4><img src="time_patterns/hourly_patterns.png" alt="hourly_patterns.png"></div><div><h4>Day Of Week Patterns</h4><img src="time_patterns/day_of_week_patterns.png" alt="day_of_week_patterns.png"></div><div><h4>Time Heatmap</h4><img src="time_patterns/time_heatmap.png" alt="time_heatmap.png"></div>
+                </div>
+            </div>
+        
+            <div class="section">
+                <h2>🔊 Volume Patterns</h2>
+                <p>Analysis of volume spikes, breakouts, and volume-price relationships.</p>
+                <div class="grid">
+        <div class="insight-box"><h3>Volume Spike Summary</h3><ul><li>Total Spikes: 13,440</li><li>Avg 5-min Return After Spike: 0.014%</li></ul></div><div><h4>Volume Spike Scatter</h4><img src="volume_patterns/volume_spike_scatter.png" alt="volume_spike_scatter.png"></div><div><h4>Volume Breakout Dist</h4><img src="volume_patterns/volume_breakout_dist.png" alt="volume_breakout_dist.png"></div>
+                </div>
+            </div>
+        
+            <div class="section">
+                <h2>📈 Price Movement Patterns</h2>
+                <p>Analysis of momentum, reversals, and price action patterns.</p>
+                <div class="grid">
+        <div><h3>Momentum Patterns</h3><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Unnamed: 0</th>
+      <th>pattern</th>
+      <th>count</th>
+      <th>continuation_rate</th>
+      <th>avg_next_return</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>3 Up</td>
+      <td>23557</td>
+      <td>0.451670</td>
+      <td>-0.000014</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>3 Down</td>
+      <td>24293</td>
+      <td>0.442432</td>
+      <td>0.000014</td>
+    </tr>
+  </tbody>
+</table></div><div><h4>Reversal Pattern Performance</h4><img src="price_patterns/reversal_performance.png" alt="Reversal Performance"></div>
+                </div>
+            </div>
+        
+            <div class="section">
+                <h2>🔗 Indicator Combinations</h2>
+                <p>Analysis of combined indicator signals (requires indicator data).</p>
+                <div class="grid">
+        <div><img src="indicator_combinations/pair_accuracy.png" alt="Pair Accuracy"></div><div><h3>Top Pairs</h3><table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Unnamed: 0</th>
+      <th>indicator_1</th>
+      <th>indicator_2</th>
+      <th>signals</th>
+      <th>accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>momentum_rsi</td>
+      <td>volatility_bbl</td>
+      <td>9032</td>
+      <td>0.563441</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>volatility_bbl</td>
+      <td>volume_mfi</td>
+      <td>6002</td>
+      <td>0.549317</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>volatility_bbl</td>
+      <td>trend_macd</td>
+      <td>3236</td>
+      <td>0.541100</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>momentum_rsi</td>
+      <td>volume_mfi</td>
+      <td>8628</td>
+      <td>0.525151</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>momentum_rsi</td>
+      <td>trend_macd</td>
+      <td>26</td>
+      <td>0.423077</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>trend_macd</td>
+      <td>volume_mfi</td>
+      <td>2885</td>
+      <td>0.272790</td>
+    </tr>
+  </tbody>
+</table></div>
+                </div>
+            </div>
+        
+        </div>
+    </body>
+    </html>
+    

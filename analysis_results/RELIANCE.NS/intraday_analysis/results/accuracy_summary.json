@@ -1,0 +1,115 @@
+{
+  "symbol": "RELIANCE.NS",
+  "interval": "1min",
+  "total_indicators": 83,
+  "statistics": {
+    "accuracy": {
+      "mean": 0.234673907260109,
+      "median": 0.0,
+      "std": 0.2519352739262765,
+      "min": 0.0,
+      "max": 0.5883355359254364
+    },
+    "precision": {
+      "mean": 0.17827357118950618,
+      "median": 0.0
+    },
+    "recall": {
+      "mean": 0.24407448435226914,
+      "median": 0.0
+    },
+    "f1_score": {
+      "mean": 0.20033836162527155,
+      "median": 0.0
+    },
+    "total_signals": {
+      "mean": 118852.65060240965,
+      "median": 0.0,
+      "sum": 9864770
+    }
+  },
+  "top_10_indicators": [
+    {
+      "indicator": "volatility_bbl",
+      "accuracy": 0.5021448999046711,
+      "precision": 0.5021448999046711,
+      "recall": 1.0,
+      "f1_score": 0.6685705219736633,
+      "total_signals": 29372
+    },
+    {
+      "indicator": "volatility_kcl",
+      "accuracy": 0.48512612761146573,
+      "precision": 0.48512612761146573,
+      "recall": 1.0,
+      "f1_score": 0.6533130332730676,
+      "total_signals": 84914
+    },
+    {
+      "indicator": "volume_mfi",
+      "accuracy": 0.46060623011271346,
+      "precision": 0.46060623011271346,
+      "recall": 1.0,
+      "f1_score": 0.6307055531006039,
+      "total_signals": 464807
+    },
+    {
+      "indicator": "momentum_stoch_rsi_k",
+      "accuracy": 0.45838563238913493,
+      "precision": 0.45838563238913493,
+      "recall": 1.0,
+      "f1_score": 0.628620609266707,
+      "total_signals": 467663
+    },
+    {
+      "indicator": "momentum_stoch_rsi",
+      "accuracy": 0.45838563238913493,
+      "precision": 0.45838563238913493,
+      "recall": 1.0,
+      "f1_score": 0.628620609266707,
+      "total_signals": 467663
+    },
+    {
+      "indicator": "momentum_stoch_rsi_d",
+      "accuracy": 0.45838563238913493,
+      "precision": 0.45838563238913493,
+      "recall": 1.0,
+      "f1_score": 0.628620609266707,
+      "total_signals": 467663
+    },
+    {
+      "indicator": "trend_aroon_up",
+      "accuracy": 0.4598534255720291,
+      "precision": 0.4598534255720291,
+      "recall": 1.0,
+      "f1_score": 0.6299994472278476,
+      "total_signals": 136313
+    },
+    {
+      "indicator": "trend_adx_pos",
+      "accuracy": 0.45422049560939726,
+      "precision": 0.45422049560939726,
+      "recall": 1.0,
+      "f1_score": 0.6246927436118335,
+      "total_signals": 87004
+    },
+    {
+      "indicator": "trend_psar_up_indicator",
+      "accuracy": 0.4601663440916462,
+      "precision": 0.4601663440916462,
+      "recall": 1.0,
+      "f1_score": 0.6302930429175324,
+      "total_signals": 19117
+    },
+    {
+      "indicator": "volatility_bbp",
+      "accuracy": 0.5486087768440709,
+      "precision": 0.5409097622212377,
+      "recall": 0.5551765954221616,
+      "f1_score": 0.547950329144225,
+      "total_signals": 53550
+    }
+  ],
+  "indicators_above_random": 15,
+  "indicators_below_random": 68
+}

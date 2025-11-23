@@ -1,0 +1,115 @@
+{
+  "symbol": "HCLTECH.NS",
+  "interval": "1min",
+  "total_indicators": 26,
+  "statistics": {
+    "accuracy": {
+      "mean": 0.1588335047249806,
+      "median": 0.0,
+      "std": 0.2257765314883285,
+      "min": 0.0,
+      "max": 0.5339805825242718
+    },
+    "precision": {
+      "mean": 0.14801284713946447,
+      "median": 0.0
+    },
+    "recall": {
+      "mean": 0.1950065115567382,
+      "median": 0.0
+    },
+    "f1_score": {
+      "mean": 0.16424123687277314,
+      "median": 0.0
+    },
+    "total_signals": {
+      "mean": 95.42307692307692,
+      "median": 0.0,
+      "sum": 2481
+    }
+  },
+  "top_10_indicators": [
+    {
+      "indicator": "RSI",
+      "accuracy": 0.5339805825242718,
+      "precision": 0.49382716049382713,
+      "recall": 0.851063829787234,
+      "f1_score": 0.625,
+      "total_signals": 103
+    },
+    {
+      "indicator": "BB_Lower",
+      "accuracy": 0.43333333333333335,
+      "precision": 0.43333333333333335,
+      "recall": 1.0,
+      "f1_score": 0.6046511627906976,
+      "total_signals": 60
+    },
+    {
+      "indicator": "Stoch_K",
+      "accuracy": 0.5173501577287066,
+      "precision": 0.4742268041237113,
+      "recall": 0.6433566433566433,
+      "f1_score": 0.5459940652818991,
+      "total_signals": 317
+    },
+    {
+      "indicator": "MACD_Signal",
+      "accuracy": 0.48450244698205547,
+      "precision": 0.43543543543543545,
+      "recall": 0.5311355311355311,
+      "f1_score": 0.47854785478547857,
+      "total_signals": 613
+    },
+    {
+      "indicator": "MACD_Diff",
+      "accuracy": 0.5187601957585645,
+      "precision": 0.4576923076923077,
+      "recall": 0.4358974358974359,
+      "f1_score": 0.44652908067542213,
+      "total_signals": 613
+    },
+    {
+      "indicator": "Smart_Money_Flow",
+      "accuracy": 0.47952218430034127,
+      "precision": 0.4271523178807947,
+      "recall": 0.4942528735632184,
+      "f1_score": 0.458259325044405,
+      "total_signals": 586
+    },
+    {
+      "indicator": "RSI_15m",
+      "accuracy": 0.44,
+      "precision": 0.43333333333333335,
+      "recall": 0.34210526315789475,
+      "f1_score": 0.38235294117647056,
+      "total_signals": 75
+    },
+    {
+      "indicator": "RSI_5m",
+      "accuracy": 0.3888888888888889,
+      "precision": 0.36,
+      "recall": 0.43902439024390244,
+      "f1_score": 0.3956043956043956,
+      "total_signals": 90
+    },
+    {
+      "indicator": "MACD",
+      "accuracy": 0.3333333333333333,
+      "precision": 0.3333333333333333,
+      "recall": 0.3333333333333333,
+      "f1_score": 0.3333333333333333,
+      "total_signals": 24
+    },
+    {
+      "indicator": "Return_Lag_5",
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "total_signals": 0
+    }
+  ],
+  "indicators_above_random": 3,
+  "indicators_below_random": 23
+}

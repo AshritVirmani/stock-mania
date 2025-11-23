@@ -1,0 +1,14 @@
+{
+  "symbol": "HDFCBANK.NS",
+  "current_price": 998.0499877929688,
+  "average_intrinsic_value": 610.0066782449447,
+  "discount_premium_pct": -38.880147717462634,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-24T00:30:52.030739",
+  "valuation_methods": {
+    "Modified Graham": 1092.8047250432642,
+    "P/E Based (Fair P/E=12)": 524.5462680207668,
+    "P/B Based (Fair P/B=1.2)": 424.8948,
+    "PEG Based": 397.78091991574814
+  }
+}

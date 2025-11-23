@@ -1,0 +1,84 @@
+
+================================================================================
+💰 INTRINSIC VALUE ANALYSIS: HDFCBANK.NS
+================================================================================
+
+📊 Fetching fundamental data for HDFCBANK.NS...
+   ⚠️  Using default Risk-Free Rate: 7.1% (could not fetch live data)
+⚠️  Warning: Dividend yield seems high (110.00%)
+   This might be a data error. Recalculating from dividend rate...
+   Recalculated dividend yield: 1.10%
+✅ Data fetched successfully
+
+📈 Current Market Price: ₹998.05
+📋 Company: HDFC Bank Limited
+🏢 Sector: Financial Services
+🏭 Industry: Banks - Regional
+
+ℹ️  Using Sector Benchmarks: Fair P/E=12, Fair P/B=1.2
+   📌 Financial Company: DCF disabled, focusing on P/B and P/E analysis
+
+--------------------------------------------------------------------------------
+🔍 CALCULATING INTRINSIC VALUE (Multiple Methods)
+--------------------------------------------------------------------------------
+1️⃣  Modified Graham:        ₹1092.80 (+9.5%)
+   ⚠️  DCF not suitable for Financial Services/Banks - Regional. Using P/B focus instead.
+3️⃣  P/E Based (Fair P/E=12):   ₹524.55 (-47.4%)
+4️⃣  P/B Based (Fair P/B=1.2):  ₹424.89 (-57.4%)
+      ⭐ Primary valuation method for Financial Services
+5️⃣  PEG Based:                ₹397.78 (-60.1%)
+
+--------------------------------------------------------------------------------
+📊 SUMMARY
+--------------------------------------------------------------------------------
+Average Intrinsic Value:     ₹610.01
+Current Market Price:        ₹998.05
+Discount/Premium:            -38.9%
+
+--------------------------------------------------------------------------------
+🎯 VALUATION ASSESSMENT
+--------------------------------------------------------------------------------
+🔴 SIGNIFICANTLY OVERVALUED
+Recommendation: Consider Selling
+
+💡 Note: Market may be pricing in future growth/margin expansion
+   Consider: Earnings growth trajectory, sector trends, competitive position
+
+--------------------------------------------------------------------------------
+📋 KEY METRICS
+--------------------------------------------------------------------------------
+Trailing P/E:                22.83
+Forward P/E:                 10.36
+Price-to-Book:               2.82
+Current EPS:                 ₹43.71
+Book Value per Share:        ₹354.08
+Dividend Yield:              1.10%
+Profit Margin:               26.96%
+
+--------------------------------------------------------------------------------
+💡 IMPLIED EPS ANALYSIS
+--------------------------------------------------------------------------------
+What EPS would justify the current price at different P/E ratios?
+
+P/E Ratio       Implied EPS          vs Current EPS            Gap            
+---------------------------------------------------------------------------
+P/E 10         ₹99.80              ₹43.71                   +56.09 (+128.3%)
+P/E 15         ₹66.54              ₹43.71                   +22.82 (+52.2%)
+P/E 20         ₹49.90              ₹43.71                   +6.19 (+14.2%)
+P/E 25         ₹39.92              ₹43.71                   -3.79 (-8.7%)  ⭐
+P/E 30         ₹33.27              ₹43.71                   -10.44 (-23.9%)
+
+📊 Current EPS (₹43.71) implies P/E of 22.83
+
+💭 Interpretation:
+   Market is pricing the stock at approximately P/E 25
+
+💾 Valuation results saved to: analysis_results/HDFCBANK.NS/valuation/intrinsic_value.json
+
+================================================================================
+
+
+
+--- ERRORS/WARNINGS ---
+HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: ^IGSEC"}}}
+$^IGSEC: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")

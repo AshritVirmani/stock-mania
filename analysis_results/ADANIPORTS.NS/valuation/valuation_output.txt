@@ -1,0 +1,85 @@
+
+================================================================================
+💰 INTRINSIC VALUE ANALYSIS: ADANIPORTS.NS
+================================================================================
+
+📊 Fetching fundamental data for ADANIPORTS.NS...
+   ⚠️  Using default Risk-Free Rate: 7.1% (could not fetch live data)
+⚠️  Warning: Dividend yield seems high (47.00%)
+   This might be a data error. Recalculating from dividend rate...
+   Recalculated dividend yield: 0.47%
+⚠️  Warning: Debt-to-Equity appears to be percentage (81.56%)
+   Converted to ratio: 0.82
+✅ Data fetched successfully
+
+📈 Current Market Price: ₹1479.80
+📋 Company: Adani Ports and Special Economic Zone Limited
+🏢 Sector: Industrials
+🏭 Industry: Marine Shipping
+
+ℹ️  Using Sector Benchmarks: Fair P/E=20, Fair P/B=3.0
+
+--------------------------------------------------------------------------------
+🔍 CALCULATING INTRINSIC VALUE (Multiple Methods)
+--------------------------------------------------------------------------------
+1️⃣  Graham Formula:        ₹621.86 (-58.0%)
+2️⃣  DCF Model (10-year):      ₹100.14 (-93.2%)
+3️⃣  P/E Based (Fair P/E=20):   ₹1107.17 (-25.2%)
+4️⃣  P/B Based (Fair P/B=3.0):  ₹931.39 (-37.1%)
+5️⃣  PEG Based:                ₹1500.22 (+1.4%)
+
+--------------------------------------------------------------------------------
+📊 SUMMARY
+--------------------------------------------------------------------------------
+Average Intrinsic Value:     ₹852.16
+Current Market Price:        ₹1479.80
+Discount/Premium:            -42.4%
+
+--------------------------------------------------------------------------------
+🎯 VALUATION ASSESSMENT
+--------------------------------------------------------------------------------
+🔴 SIGNIFICANTLY OVERVALUED
+Recommendation: Consider Selling
+
+💡 Note: Market may be pricing in future growth/margin expansion
+   Consider: Earnings growth trajectory, sector trends, competitive position
+
+--------------------------------------------------------------------------------
+📋 KEY METRICS
+--------------------------------------------------------------------------------
+Trailing P/E:                26.73
+Forward P/E:                 44.26
+Price-to-Book:               4.76
+Current EPS:                 ₹55.36
+Book Value per Share:        ₹310.46
+Dividend Yield:              0.47%
+Profit Margin:               34.42%
+Debt-to-Equity:              0.82
+
+--------------------------------------------------------------------------------
+💡 IMPLIED EPS ANALYSIS
+--------------------------------------------------------------------------------
+What EPS would justify the current price at different P/E ratios?
+
+P/E Ratio       Implied EPS          vs Current EPS            Gap            
+---------------------------------------------------------------------------
+P/E 10         ₹147.98             ₹55.36                   +92.62 (+167.3%)
+P/E 15         ₹98.65              ₹55.36                   +43.29 (+78.2%)
+P/E 20         ₹73.99              ₹55.36                   +18.63 (+33.7%)
+P/E 25         ₹59.19              ₹55.36                   +3.83 (+6.9%)  ⭐
+P/E 30         ₹49.33              ₹55.36                   -6.03 (-10.9%)
+
+📊 Current EPS (₹55.36) implies P/E of 26.73
+
+💭 Interpretation:
+   Market is pricing the stock at approximately P/E 25
+
+💾 Valuation results saved to: analysis_results/ADANIPORTS.NS/valuation/intrinsic_value.json
+
+================================================================================
+
+
+
+--- ERRORS/WARNINGS ---
+HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: ^IGSEC"}}}
+$^IGSEC: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")

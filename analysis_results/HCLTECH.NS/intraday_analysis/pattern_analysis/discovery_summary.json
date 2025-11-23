@@ -1,0 +1,40 @@
+{
+    "symbol": "HCLTECH.NS",
+    "timestamp": "2025-11-24T04:08:39.693933",
+    "data_file": "analysis_results/HCLTECH.NS/intraday_analysis/data/HCLTECH.NS_intraday_1min_raw.csv",
+    "results": {
+        "Price Analysis": {
+            "success": true,
+            "output": "{'momentum_file': 'analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/price_patterns/momentum_analysis.csv', 'reversal_file': 'analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/price_patterns/reversal_patterns.csv', 'plots': ['analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/price_patterns/reversal_performance.png']}"
+        },
+        "Volume Analysis": {
+            "success": true,
+            "output": "{'spikes_file': 'analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/volume_patterns/volume_spikes.csv', 'breakout_file': 'analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/volume_patterns/volume_breakouts.csv', 'plots': ['analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/volume_patterns/volume_spike_scatter.png', 'analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/volume_patterns/volume_breakout_dist.png']}"
+        },
+        "Time Analysis": {
+            "success": true,
+            "output": "{'hourly_stats': 'analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/time_patterns/hourly_analysis.csv', 'day_stats': 'analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/time_patterns/day_of_week_analysis.csv', 'session_stats': 'analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/time_patterns/session_analysis.csv', 'plots': ['analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/time_patterns/hourly_patterns.png', 'analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/time_patterns/day_of_week_patterns.png', 'analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/time_patterns/time_heatmap.png', 'analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/time_patterns/average_intraday_path.png']}"
+        },
+        "Algo Trading": {
+            "success": true,
+            "output": "analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/algo_patterns"
+        },
+        "Smart Money": {
+            "success": true,
+            "output": "analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/smart_money"
+        },
+        "Indicator Combinations": {
+            "success": false,
+            "output": "Insufficient indicators"
+        },
+        "Report": {
+            "success": true,
+            "output": "analysis_results/HCLTECH.NS/intraday_analysis/pattern_analysis/comprehensive_pattern_report.html"
+        }
+    },
+    "summary": {
+        "total_steps": 7,
+        "successful": 6,
+        "failed": 1
+    }
+}

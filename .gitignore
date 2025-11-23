@@ -109,3 +109,7 @@ env*
 
 # Original Source (Dev)
 ta/_wrapper.py
+analysis_results/**/*.csv
+data/*.csv
+analysis_results/**/processed_data.csv
+analysis_results/**/*_indicators.csv

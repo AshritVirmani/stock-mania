@@ -27,6 +27,15 @@ import subprocess
 import pandas as pd
 import yfinance as yf
 import time
+import logging
+from datetime import datetime
+
+# Dhan API imports (optional - only used if user chooses Dhan)
+try:
+    from dhanhq import dhanhq
+    DHAN_AVAILABLE = True
+except ImportError:
+    DHAN_AVAILABLE = False
 
 # Get the directory where this script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -34,6 +43,14 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 
 BASE_ANALYSIS_DIR = os.path.join(PROJECT_ROOT, "analysis_results")
+
+# ==========================================
+# DHAN API CONFIGURATION
+# ==========================================
+# Default Dhan API credentials (can be overridden via environment variables)
+DHAN_CLIENT_ID = os.getenv("DHAN_CLIENT_ID", "1109130648")
+DHAN_ACCESS_TOKEN = os.getenv("DHAN_ACCESS_TOKEN", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkaGFuIiwicGFydG5lcklkIjoiIiwiZXhwIjoxNzYzOTY1ODM1LCJpYXQiOjE3NjM4Nzk0MzUsInRva2VuQ29uc3VtZXJUeXBlIjoiU0VMRiIsIndlYmhvb2tVcmwiOiIiLCJkaGFuQ2xpZW50SWQiOiIxMTA5MTMwNjQ4In0.YRHIEqoabzTLwde29P8g6ZKGpG9gWI4YpfJ2Ge5yDcn_cxzFLOXslEZ-5PY2HPGdTJPpQDGRK6YUOUi1pkzWvg")
+DHAN_SCRIP_MASTER_PATH = os.getenv("DHAN_SCRIP_MASTER_PATH", "/Users/av/Downloads/chrome downloads/api-scrip-master-detailed.csv")
 
 
 def get_ticker_analysis_dir(stock_symbol):
@@ -84,16 +101,437 @@ def get_reports_dir(stock_symbol):
     return reports_dir
 
 
-def run_complete_setup(stock_symbol):
-    """Run complete analysis setup for a new ticker."""
-    print("\n" + "="*80)
-    print(f"🚀 COMPLETE SETUP FOR {stock_symbol}")
-    print("="*80)
+# ==========================================
+# DHAN API EXTRACTOR CLASSES
+# ==========================================
+
+class ScripMaster:
+    """Handles Scrip Master CSV lookup for Dhan API."""
     
-    # Step 1: Fetch data and calculate indicators
-    print("\n" + "="*80)
+    def __init__(self, csv_path):
+        self.csv_path = csv_path
+        self.df = None
+        self.logger = logging.getLogger(__name__)
+    
+    def load(self):
+        """Load the Scrip Master CSV file."""
+        try:
+            self.logger.info(f"Loading Scrip Master from {self.csv_path}...")
+            cols = ['EXCH_ID', 'SECURITY_ID', 'SYMBOL_NAME', 'INSTRUMENT', 'SEGMENT', 'UNDERLYING_SYMBOL', 'DISPLAY_NAME']
+            self.df = pd.read_csv(self.csv_path, usecols=cols, dtype={'SECURITY_ID': str})
+            
+            # Clean strings
+            for col in ['SYMBOL_NAME', 'UNDERLYING_SYMBOL', 'DISPLAY_NAME', 'EXCH_ID', 'INSTRUMENT']:
+                if col in self.df.columns:
+                    self.df[col] = self.df[col].astype(str).str.strip().str.upper()
+            
+            self.logger.info(f"Scrip Master loaded. {len(self.df)} records.")
+        except Exception as e:
+            self.logger.error(f"Failed to load Scrip Master: {e}")
+            self.df = None
+    
+    def search(self, symbol, exchange="NSE"):
+        """Search for a symbol in the Scrip Master."""
+        if self.df is None:
+            return None
+        
+        symbol = symbol.strip().upper()
+        exchange = exchange.strip().upper()
+        
+        # Filter by Exchange first
+        matches = self.df[self.df['EXCH_ID'] == exchange]
+        if matches.empty:
+            return None
+        
+        # Remove .NS suffix if present for search
+        search_symbol = symbol.replace('.NS', '')
+        
+        # 1. Try exact match on UNDERLYING_SYMBOL
+        exact_underlying = matches[matches['UNDERLYING_SYMBOL'] == search_symbol]
+        
+        target_row = None
+        
+        if not exact_underlying.empty:
+            # Prefer EQUITY
+            equity_match = exact_underlying[exact_underlying['INSTRUMENT'] == 'EQUITY']
+            if not equity_match.empty:
+                target_row = equity_match.iloc[0]
+            else:
+                target_row = exact_underlying.iloc[0]
+        else:
+            # 2. Try exact match on SYMBOL_NAME or DISPLAY_NAME
+            exact_name = matches[(matches['SYMBOL_NAME'] == search_symbol) | (matches['DISPLAY_NAME'] == search_symbol)]
+            if not exact_name.empty:
+                equity_match = exact_name[exact_name['INSTRUMENT'] == 'EQUITY']
+                if not equity_match.empty:
+                    target_row = equity_match.iloc[0]
+                else:
+                    target_row = exact_name.iloc[0]
+            else:
+                # 3. Try contains (Startswith preferred)
+                starts = matches[matches['SYMBOL_NAME'].str.startswith(search_symbol, na=False) | 
+                                matches['DISPLAY_NAME'].str.startswith(search_symbol, na=False)]
+                candidates = starts if not starts.empty else matches[matches['SYMBOL_NAME'].str.contains(search_symbol, na=False)]
+                
+                if candidates.empty:
+                    return None
+                
+                # Prioritize Equity/Index
+                equity_cands = candidates[candidates['INSTRUMENT'] == 'EQUITY']
+                if not equity_cands.empty:
+                    target_row = equity_cands.iloc[0]
+                else:
+                    index_cands = candidates[candidates['INSTRUMENT'].isin(['INDEX', 'IDX'])]
+                    if not index_cands.empty:
+                        target_row = index_cands.iloc[0]
+                    else:
+                        target_row = candidates.iloc[0]
+        
+        if target_row is None:
+            return None
+        
+        # Map details
+        exch_id = target_row['EXCH_ID']
+        instr = target_row['INSTRUMENT']
+        
+        return {
+            "security_id": target_row['SECURITY_ID'],
+            "symbol_name": target_row['SYMBOL_NAME'],
+            "exchange_segment": self._get_segment(exch_id, instr),
+            "instrument_type": instr
+        }
+    
+    def _get_segment(self, exch_id, instr):
+        """Map exchange and instrument to Dhan API segment."""
+        if exch_id == "NSE":
+            if instr == "EQUITY":
+                return "NSE_EQ"
+            elif instr in ["INDEX", "IDX"]:
+                return "IDX"
+            elif "FUT" in instr or "OPT" in instr:
+                return "NSE_FNO"
+            return "NSE_EQ"
+        elif exch_id == "BSE":
+            if instr == "EQUITY":
+                return "BSE_EQ"
+            return "BSE_FNO"
+        elif exch_id == "MCX":
+            return "MCX_COMM"
+        return "NSE_EQ"
+
+
+class DhanDataExtractor:
+    """Extracts historical data from Dhan API."""
+    
+    def __init__(self, client_id, access_token):
+        self.client_id = client_id
+        self.access_token = access_token
+        self.dhan = None
+        self.logger = logging.getLogger(__name__)
+    
+    def login(self):
+        """Initialize Dhan API connection."""
+        try:
+            self.dhan = dhanhq(self.client_id, self.access_token)
+            self.logger.info("Dhan API initialized successfully.")
+        except Exception as e:
+            self.logger.error(f"Failed to initialize Dhan API: {e}")
+            raise
+    
+    def fetch_data(self, security_id, exchange_segment, instrument_type, from_date, to_date, interval="D"):
+        """Fetch historical data from Dhan API."""
+        if not self.dhan:
+            self.logger.error("API not initialized. Call login() first.")
+            return None
+        
+        self.logger.info(f"Fetching data for Security ID: {security_id} ({interval}) from {from_date} to {to_date}...")
+        
+        try:
+            response = None
+            
+            # Choose method based on interval
+            if interval.upper() in ['D', 'DAY', '1D']:
+                response = self.dhan.historical_daily_data(
+                    security_id=security_id,
+                    exchange_segment=exchange_segment,
+                    instrument_type=instrument_type,
+                    expiry_code=0,
+                    from_date=from_date,
+                    to_date=to_date
+                )
+            else:
+                # Assumes minute data for other intervals
+                # The Dhan API intraday_minute_data may need interval parameter
+                # Check API documentation for exact parameter name
+                try:
+                    response = self.dhan.intraday_minute_data(
+                        security_id=security_id,
+                        exchange_segment=exchange_segment,
+                        instrument_type=instrument_type,
+                        from_date=from_date,
+                        to_date=to_date
+                    )
+                except TypeError:
+                    # If interval parameter is required, try with interval
+                    try:
+                        response = self.dhan.intraday_minute_data(
+                            security_id=security_id,
+                            exchange_segment=exchange_segment,
+                            instrument_type=instrument_type,
+                            from_date=from_date,
+                            to_date=to_date,
+                            interval=interval
+                        )
+                    except Exception as e:
+                        self.logger.error(f"Failed to fetch intraday data: {e}")
+                        return None
+            
+            if response.get('status') == 'failure':
+                self.logger.error(f"API Error: {response.get('remarks', 'Unknown error')}")
+                return None
+            
+            data = response.get('data', {})
+            if not data:
+                self.logger.warning("No data returned from API.")
+                return None
+            
+            # Convert to DataFrame
+            df = pd.DataFrame(data)
+            
+            self.logger.info(f"Fetched {len(df)} rows.")
+            return df
+        except Exception as e:
+            self.logger.error(f"Exception during fetch: {e}")
+            return None
+
+
+def fetch_dhan_data(stock_symbol, from_date=None, to_date=None):
+    """
+    Fetches historical stock data from Dhan API.
+    Returns a pandas DataFrame in yfinance format or None if it fails.
+    """
+    if not DHAN_AVAILABLE:
+        print("❌ Dhan API library (dhanhq) not available. Install with: pip install dhanhq")
+        return None
+    
+    print(f"📡 Fetching data from Dhan API for {stock_symbol}...")
+    
+    # Remove .NS suffix for symbol search
+    search_symbol = stock_symbol.replace('.NS', '')
+    
+    # Initialize Scrip Master
+    if not os.path.exists(DHAN_SCRIP_MASTER_PATH):
+        print(f"❌ Scrip Master file not found: {DHAN_SCRIP_MASTER_PATH}")
+        print("   Please set DHAN_SCRIP_MASTER_PATH environment variable or update the path in the script.")
+        return None
+    
+    scrip_master = ScripMaster(DHAN_SCRIP_MASTER_PATH)
+    scrip_master.load()
+    
+    # Find Security ID
+    scrip_info = scrip_master.search(search_symbol, "NSE")
+    
+    if not scrip_info:
+        print(f"❌ Could not find symbol '{search_symbol}' in Scrip Master.")
+        return None
+    
+    print(f"✅ Found: {scrip_info['symbol_name']} -> ID: {scrip_info['security_id']} ({scrip_info['exchange_segment']})")
+    
+    # Initialize Extractor
+    try:
+        extractor = DhanDataExtractor(DHAN_CLIENT_ID, DHAN_ACCESS_TOKEN)
+        extractor.login()
+    except Exception as e:
+        print(f"❌ Failed to initialize Dhan API: {e}")
+        return None
+    
+    # Set date range (default to last 5 years if not specified)
+    if to_date is None:
+        to_date = datetime.now().strftime('%Y-%m-%d')
+    if from_date is None:
+        # Default to 5 years back
+        from_date_obj = datetime.now() - pd.DateOffset(years=5)
+        from_date = from_date_obj.strftime('%Y-%m-%d')
+    
+    # Fetch Data
+    df = extractor.fetch_data(
+        security_id=scrip_info['security_id'],
+        exchange_segment=scrip_info['exchange_segment'],
+        instrument_type=scrip_info['instrument_type'],
+        from_date=from_date,
+        to_date=to_date,
+        interval="D"  # Daily data
+    )
+    
+    if df is None or df.empty:
+        print("❌ No data returned from Dhan API.")
+        return None
+    
+    # Convert Dhan API format to yfinance format
+    # Dhan API typically returns: Date, Open, High, Low, Close, Volume
+    # Map column names to match yfinance format
+    column_mapping = {
+        'open': 'Open',
+        'high': 'High',
+        'low': 'Low',
+        'close': 'Close',
+        'volume': 'Volume',
+        'OPEN': 'Open',
+        'HIGH': 'High',
+        'LOW': 'Low',
+        'CLOSE': 'Close',
+        'VOLUME': 'Volume'
+    }
+    
+    # Rename columns
+    df.columns = [col.strip() for col in df.columns]
+    for old_col, new_col in column_mapping.items():
+        if old_col in df.columns:
+            df.rename(columns={old_col: new_col}, inplace=True)
+    
+    # Debug: Print available columns
+    print(f"   Available columns: {list(df.columns)}")
+    
+    # Set date as index if present
+    # Dhan API typically returns 'timestamp' column (Unix timestamp in milliseconds or seconds)
+    date_cols = ['timestamp', 'Timestamp', 'TIMESTAMP', 'date', 'Date', 'DATE', 'start_Time', 'START_TIME', 'start_time']
+    date_found = False
+    for date_col in date_cols:
+        if date_col in df.columns:
+            try:
+                # Try parsing as Unix timestamp (could be in seconds or milliseconds)
+                timestamp_values = df[date_col]
+                # Check if values are numeric (Unix timestamp)
+                if pd.api.types.is_numeric_dtype(timestamp_values):
+                    # If values are very large (> 1e12), they're likely in milliseconds
+                    if timestamp_values.max() > 1e12:
+                        df[date_col] = pd.to_datetime(timestamp_values, unit='ms')
+                    else:
+                        df[date_col] = pd.to_datetime(timestamp_values, unit='s')
+                else:
+                    # Try parsing as regular datetime string
+                    df[date_col] = pd.to_datetime(df[date_col])
+                
+                df.set_index(date_col, inplace=True)
+                df.index.name = 'Date'
+                date_found = True
+                print(f"   ✅ Using '{date_col}' as date column")
+                break
+            except Exception as e:
+                print(f"   Warning: Could not parse date column '{date_col}': {e}")
+                continue
+    
+    # If no date column found, check if index is already a datetime
+    if not date_found:
+        if isinstance(df.index, pd.DatetimeIndex):
+            df.index.name = 'Date'
+            date_found = True
+        else:
+            print(f"   ⚠️  No date column found. Creating sequential date index.")
+            # Create a date range index (fallback)
+            df.index = pd.date_range(start='2020-01-01', periods=len(df), freq='D')
+            df.index.name = 'Date'
+    
+    # Ensure required columns exist
+    required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        print(f"❌ Missing required columns: {missing_cols}")
+        print(f"   Available columns: {list(df.columns)}")
+        return None
+    
+    # Select only required columns and ensure proper data types
+    df = df[required_cols].copy()
+    for col in required_cols:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+    
+    # Sort by date
+    df.sort_index(inplace=True)
+    
+    # Remove any rows with NaN values
+    df.dropna(inplace=True)
+    
+    # Format date output safely
+    try:
+        if isinstance(df.index, pd.DatetimeIndex):
+            date_range = f"{df.index.min().date()} to {df.index.max().date()}"
+        else:
+            date_range = f"{len(df)} rows"
+        print(f"  ✅ Fetched {len(df)} rows ({date_range})")
+    except Exception as e:
+        print(f"  ✅ Fetched {len(df)} rows")
+    
+    return df
+
+
+def fetch_stock_data(stock_symbol):
+    """
+    Fetches historical stock data from Yahoo Finance.
+    Returns a pandas DataFrame or None if it fails.
+    """
+    print(f"Fetching data for {stock_symbol}...")
+    try:
+        # Fetch all available historical data
+        stock_data = yf.download(stock_symbol, start="1990-01-01", progress=False)
+        
+        if stock_data.empty:
+            print(f"❌ No data found for {stock_symbol}.")
+            return None
+    except Exception as e:
+        error_message = str(e).lower()
+        print(f"❌ An error occurred while fetching data for {stock_symbol}:")
+        print(f"   {e}")
+        if "ssl" in error_message or "certificate" in error_message or "curl" in error_message:
+            print("\n💡 HINT: This looks like a network SSL/Certificate issue.")
+            print("   This can happen when the script is run in a sandboxed environment")
+            print("   that blocks access to system security certificates.")
+            print("   Try re-running the command with elevated network permissions.")
+        return None
+
+    print(f"  Fetched {len(stock_data)} rows ({stock_data.index.min().date()} to {stock_data.index.max().date()})")
+    
+    # Standardize column names, handling potential tuples
+    # Convert to lowercase first, then capitalize for ta library compatibility
+    new_columns = []
+    for col in stock_data.columns:
+        if isinstance(col, tuple):
+            new_columns.append(col[0].lower() if col[0] else '')
+        else:
+            new_columns.append(str(col).lower())
+    stock_data.columns = new_columns
+    
+    # Capitalize column names for ta library (Open, High, Low, Close, Volume)
+    column_capitalization = {
+        'open': 'Open',
+        'high': 'High',
+        'low': 'Low',
+        'close': 'Close',
+        'volume': 'Volume',
+        'adj close': 'Adj Close'
+    }
+    for old_col, new_col in column_capitalization.items():
+        if old_col in stock_data.columns:
+            stock_data.rename(columns={old_col: new_col}, inplace=True)
+    
+    return stock_data
+
+
+def get_analysis_file_path(stock_symbol):
+    """Constructs the full path for a stock's analysis CSV file."""
+    output_dir = os.path.join("analysis_results", stock_symbol, "data")
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    return os.path.join(output_dir, f"{stock_symbol}_analysis.csv")
+
+
+def create_analysis_file(stock_symbol):
+    """
+    Fetches stock data, calculates TA indicators, and saves to a CSV file.
+    Returns the path to the file, or None if it fails.
+    """
+    print(f"\n{'='*80}")
     print("STEP 1: Fetching Data and Calculating Indicators")
-    print("="*80)
+    print(f"{'='*80}")
     print(f"📥 Fetching historical data for {stock_symbol}...")
     print("   (This may take a few minutes for stocks with long histories)")
     
@@ -109,6 +547,7 @@ def run_complete_setup(stock_symbol):
     # Proceed with fetching and analysis if no recent file
     stock_data = fetch_stock_data(stock_symbol)
     if stock_data is None:
+        print("❌ Failed to generate analysis file")
         return None
 
     print("Applying technical analysis indicators...")
@@ -134,6 +573,116 @@ def run_complete_setup(stock_symbol):
     except KeyboardInterrupt:
         print(f"\n⚠️  Setup cancelled by user")
         return False
+    
+    return analysis_file
+
+
+def run_complete_setup(stock_symbol, use_dhan=False):
+    """Run complete analysis setup for a new ticker."""
+    print("\n" + "="*80)
+    print(f"🚀 COMPLETE SETUP FOR {stock_symbol}")
+    print("="*80)
+    
+    # Step 1: Fetch data and calculate indicators
+    print("\n" + "="*80)
+    print("STEP 1: Fetching Data and Calculating Indicators")
+    print("="*80)
+    print(f"📥 Fetching historical data for {stock_symbol}...")
+    print("   (This may take a few minutes for stocks with long histories)")
+    
+    # Check if a recent analysis file already exists
+    analysis_file_path = get_analysis_file_path(stock_symbol)
+    if os.path.exists(analysis_file_path):
+        # Check file age
+        file_mod_time = os.path.getmtime(analysis_file_path)
+        if (time.time() - file_mod_time) / 3600 < 24: # If less than 24 hours old
+            print(f"✅ Using recent analysis file: {analysis_file_path}")
+            analysis_file = analysis_file_path
+        else:
+            # File exists but is old, proceed with fetching
+            analysis_file = None
+    else:
+        analysis_file = None
+
+    # Proceed with fetching and analysis if no recent file
+    if analysis_file is None:
+        if use_dhan:
+            stock_data = fetch_dhan_data(stock_symbol)
+        else:
+            stock_data = fetch_stock_data(stock_symbol)
+        
+        if stock_data is None:
+            return None
+        
+        print("Applying technical analysis indicators...")
+        
+        try:
+            # Import ta module to calculate indicators directly
+            import ta
+            
+            # Ensure column names are capitalized correctly for ta library
+            if 'open' in stock_data.columns:
+                stock_data.rename(columns={
+                    'open': 'Open',
+                    'high': 'High',
+                    'low': 'Low',
+                    'close': 'Close',
+                    'volume': 'Volume'
+                }, inplace=True)
+            
+            # Calculate all TA indicators
+            print("   Calculating 86 technical indicators...")
+            df_ta = ta.add_all_ta_features(
+                stock_data, 
+                open="Open", 
+                high="High", 
+                low="Low", 
+                close="Close", 
+                volume="Volume", 
+                fillna=True
+            )
+            
+            # Save to analysis file
+            data_dir = get_data_dir(stock_symbol)
+            analysis_file = os.path.join(data_dir, f"{stock_symbol}_analysis.csv")
+            df_ta.to_csv(analysis_file)
+            
+            print(f"✅ Analysis file created: {analysis_file}")
+            print(f"   - {len(df_ta)} rows of data")
+            print(f"   - {len(df_ta.columns)} columns (OHLCV + {len(df_ta.columns) - 5} indicators)")
+            
+        except Exception as e:
+            print(f"❌ Error calculating indicators: {e}")
+            # Fallback to subprocess method (for yfinance data)
+            if not use_dhan:
+                print("   Attempting fallback method...")
+                try:
+                    result = subprocess.run(
+                        ['python3', os.path.join(SCRIPT_DIR, '01_analyze_indian_stocks.py'), stock_symbol],
+                        check=True,
+                        capture_output=False,
+                        cwd=PROJECT_ROOT
+                    )
+                    data_dir = get_data_dir(stock_symbol)
+                    analysis_file = os.path.join(data_dir, f"{stock_symbol}_analysis.csv")
+                    
+                    if not os.path.exists(analysis_file):
+                        print(f"❌ Failed to generate analysis file")
+                        return False
+                    
+                    print(f"✅ Analysis file created: {analysis_file}")
+                except subprocess.CalledProcessError as e:
+                    print(f"❌ Error in fallback method: {e}")
+                    return False
+                except KeyboardInterrupt:
+                    print(f"\n⚠️  Setup cancelled by user")
+                    return False
+            else:
+                print(f"❌ Failed to process Dhan data")
+                return False
+    else:
+        # Use existing analysis file
+        analysis_file = analysis_file_path
     
     # Step 2: Intrinsic Value Calculation
     print("\n" + "="*80)
@@ -543,7 +1092,23 @@ def main():
         print(f"⚠️  Adding .NS suffix for Indian stock")
         stock_symbol = stock_symbol + '.NS'
     
-    run_complete_setup(stock_symbol)
+    # Ask user if they want to use Dhan data
+    use_dhan = False
+    if DHAN_AVAILABLE:
+        print("\n" + "="*80)
+        print("DATA SOURCE SELECTION")
+        print("="*80)
+        response = input("Do you want to use Dhan API data? (y/n): ").strip().lower()
+        if response in ['y', 'yes']:
+            use_dhan = True
+            print("✅ Using Dhan API for data fetching")
+        else:
+            print("✅ Using Yahoo Finance for data fetching")
+    else:
+        print("ℹ️  Dhan API not available. Using Yahoo Finance for data fetching.")
+        print("   (Install dhanhq with: pip install dhanhq)")
+    
+    run_complete_setup(stock_symbol, use_dhan=use_dhan)
 
 
 if __name__ == "__main__":

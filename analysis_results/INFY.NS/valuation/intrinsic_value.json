@@ -1,0 +1,15 @@
+{
+  "symbol": "INFY.NS",
+  "current_price": 1545.0,
+  "average_intrinsic_value": 727.909657564773,
+  "discount_premium_pct": -52.88610630648718,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-23T13:22:11.374978",
+  "valuation_methods": {
+    "Modified Graham": 1410.5660704826541,
+    "DCF Model (10-year)": 8.319107081218387,
+    "P/E Based (Fair P/E=25)": 1745.7500872310075,
+    "P/B Based (Fair P/B=5.0)": 14.035,
+    "PEG Based": 460.878023028986
+  }
+}

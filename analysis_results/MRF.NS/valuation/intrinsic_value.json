@@ -1,0 +1,15 @@
+{
+  "symbol": "MRF.NS",
+  "current_price": 152205.0,
+  "average_intrinsic_value": 79456.54768830583,
+  "discount_premium_pct": -47.79636169093931,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-20T14:34:07.948471",
+  "valuation_methods": {
+    "Graham Formula": 67139.81986027177,
+    "DCF Model (10-year)": 31157.897961488772,
+    "P/E Based (Fair P/E=20)": 87412.40417651017,
+    "P/B Based (Fair P/B=3.5)": 160436.36,
+    "PEG Based": 51136.256443258455
+  }
+}

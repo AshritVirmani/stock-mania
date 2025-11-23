@@ -1,0 +1,14 @@
+{
+  "symbol": "TATAINVEST.NS",
+  "current_price": 760.75,
+  "average_intrinsic_value": 569.62675,
+  "discount_premium_pct": -25.12300361485376,
+  "assessment": "\ud83d\udd34 SIGNIFICANTLY OVERVALUED",
+  "timestamp": "2025-11-20T14:17:47.563966",
+  "valuation_methods": {
+    "Modified Graham": 156.25,
+    "P/E Based (Fair P/E=18)": 112.5,
+    "P/B Based (Fair P/B=3.0)": 1886.007,
+    "PEG Based": 123.75
+  }
+}

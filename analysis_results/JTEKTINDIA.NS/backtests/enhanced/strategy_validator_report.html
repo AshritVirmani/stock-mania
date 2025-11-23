@@ -1,0 +1,135 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Strategy Validator Report: JTEKTINDIA.NS</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0 auto; max-width: 1200px; padding: 20px; background-color: #f9f9f9; }
+            h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+            h2 { color: #34495e; margin-top: 30px; }
+            .container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+            .summary-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+            .summary-table th, .summary-table td { border: 1px solid #e0e0e0; padding: 12px; text-align: left; }
+            .summary-table th { background-color: #f2f6fc; font-weight: 600; color: #2c3e50; }
+            .comparison-table { border-collapse: collapse; width: 100%; font-size: 14px; margin-top: 20px; }
+            .comparison-table th, .comparison-table td { border: 1px solid #e0e0e0; padding: 12px; text-align: center; }
+            .comparison-table th { background-color: #e8f4f8; font-weight: 600; }
+            .plot-container { text-align: center; margin: 20px 0; }
+            img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; }
+            .caption { font-style: italic; color: #666; margin-top: 8px; }
+            .metric-box { background-color: #e8f4f8; border-left: 4px solid #3498db; padding: 15px; margin: 10px 0; }
+            .winner { background-color: #d4edda; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <h1>Strategy Validator Report: JTEKTINDIA.NS</h1>
+        
+        <div class="container">
+            <h2>Executive Summary</h2>
+            <table border="1" class="dataframe summary-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Stock</th>
+      <th>Strategy</th>
+      <th>Total Log Return</th>
+      <th>Annualized Return</th>
+      <th>Average P-Value</th>
+      <th>Num Walk-Forward Periods</th>
+      <th>Regime Filtering</th>
+      <th>Pattern Exit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>JTEKTINDIA.NS</td>
+      <td>Enhanced Donchian (Regime Filtered + Pattern Exit)</td>
+      <td>-2.1573</td>
+      <td>-11.10%</td>
+      <td>0.6900</td>
+      <td>39</td>
+      <td>✅ Enabled</td>
+      <td>✅ Enabled</td>
+    </tr>
+  </tbody>
+</table>
+            <div class="metric-box">
+                <strong>Methodology:</strong> Walk-Forward Optimization (730 day train / 182 day test).
+                <br>
+                <strong>Validation:</strong> Monte Carlo Permutation Test (1000 iterations per period).
+                <br>
+                <strong>Transaction Costs:</strong> 10.0 bps per trade.
+            </div>
+        </div>
+        
+        <div class="container">
+            <h2>Strategy Comparison: Blind vs Regime-Aware</h2>
+            <table border="1" class="dataframe comparison-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Metric</th>
+      <th>Blind Trend Following</th>
+      <th>Regime-Aware Strategy</th>
+      <th>Value Added</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Total Return</td>
+      <td>-2.2165</td>
+      <td>-2.1573</td>
+      <td>0.0592</td>
+    </tr>
+    <tr>
+      <td>Annualized Return</td>
+      <td>-11.41%</td>
+      <td>-11.10%</td>
+      <td>0.30%</td>
+    </tr>
+    <tr>
+      <td>Sharpe Ratio</td>
+      <td>-3.11</td>
+      <td>-3.16</td>
+      <td>-0.05</td>
+    </tr>
+    <tr>
+      <td>Max Drawdown</td>
+      <td>-247.20%</td>
+      <td>-240.75%</td>
+      <td>6.45%</td>
+    </tr>
+    <tr>
+      <td>Volatility</td>
+      <td>460.09%</td>
+      <td>441.35%</td>
+      <td>-18.73%</td>
+    </tr>
+    <tr>
+      <td>Total Trades</td>
+      <td>255</td>
+      <td>289</td>
+      <td>34</td>
+    </tr>
+  </tbody>
+</table>
+            <div class="caption">This comparison proves whether regime filtering adds value or is just over-fitting.</div>
+        </div>
+        
+        <div class="container">
+            <h2>1. Strategy Comparison (The "Money Plot")</h2>
+            <div class="plot-container">
+                <img src="strategy_comparison.png" alt="Strategy Comparison">
+                <div class="caption">Green line = Regime-Aware Strategy. Gray line = Blind Trend Following. If Green beats Gray, regime filtering adds Alpha.</div>
+            </div>
+        </div>
+        
+        <div class="container">
+            <h2>2. Enhanced Strategy Equity Curve</h2>
+            <div class="plot-container">
+                <img src="equity_curve.png" alt="Equity Curve">
+                <div class="caption">Cumulative Log Returns over the entire test history.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+    
