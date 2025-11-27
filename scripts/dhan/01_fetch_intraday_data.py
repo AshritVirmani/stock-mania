@@ -318,12 +318,15 @@ class DhanIntradayFetcher:
                         # Check magnitude to decide unit (ms vs s)
                         # 1e11 is roughly year 1973 in ms, safe threshold
                         if date_values.median() > 1e11:
-                            full_df['Date'] = pd.to_datetime(date_values, unit='ms')
+                            # Unix timestamp in milliseconds - Dhan API returns UTC
+                            full_df['Date'] = pd.to_datetime(date_values, unit='ms', utc=True)
                         else:
-                            full_df['Date'] = pd.to_datetime(date_values, unit='s')
+                            # Unix timestamp in seconds - Dhan API returns UTC
+                            full_df['Date'] = pd.to_datetime(date_values, unit='s', utc=True)
                     else:
                         # Try parsing as regular datetime string
-                        full_df['Date'] = pd.to_datetime(full_df['Date'])
+                        # If no timezone info, assume UTC (Dhan API standard)
+                        full_df['Date'] = pd.to_datetime(full_df['Date'], utc=True)
                     
                     full_df = full_df.set_index('Date')
                     full_df.index.name = 'Date'
@@ -343,20 +346,23 @@ class DhanIntradayFetcher:
                 logger.error(f"Available columns: {list(full_df.columns)}")
                 return None
 
-            # Convert to IST timezone if not already
-            # Dhan API typically returns data in UTC or IST-naive
-            # We need to ensure it's in IST for proper market hours filtering
+            # Convert to IST timezone
+            # Dhan API returns timestamps in UTC, so we need to convert to IST
+            ist = pytz.timezone('Asia/Kolkata')
             if full_df.index.tz is None:
-                # If timezone-naive, assume it's IST (Indian Standard Time)
-                # IST is UTC+5:30
-                ist = pytz.timezone('Asia/Kolkata')
-                full_df.index = full_df.index.tz_localize(ist)
-                logger.info("   🌏 Converted timezone-naive timestamps to IST")
-            elif full_df.index.tz != pytz.timezone('Asia/Kolkata'):
-                # If in different timezone, convert to IST
-                ist = pytz.timezone('Asia/Kolkata')
+                # If timezone-naive, assume it's UTC (Dhan API standard)
+                utc = pytz.UTC
+                full_df.index = full_df.index.tz_localize(utc).tz_convert(ist)
+                logger.info("   🌏 Converted UTC timestamps to IST")
+            elif full_df.index.tz == pytz.UTC:
+                # Already in UTC, convert to IST
+                full_df.index = full_df.index.tz_convert(ist)
+                logger.info("   🌏 Converted UTC timestamps to IST")
+            elif full_df.index.tz != ist:
+                # In different timezone, convert to IST
                 full_df.index = full_df.index.tz_convert(ist)
                 logger.info(f"   🌏 Converted from {full_df.index.tz} to IST")
+            # If already in IST, no conversion needed
 
             # Filter Columns - ensure all required columns are present
             missing_cols = [c for c in self.REQUIRED_COLS if c not in full_df.columns]

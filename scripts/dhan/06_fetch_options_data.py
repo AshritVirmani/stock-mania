@@ -298,8 +298,9 @@ class OptionsDataExtractor:
                 return pd.DataFrame()
             
             # Build DataFrame from arrays
+            # Dhan API returns Unix timestamps in UTC (seconds)
             df_data = {
-                'Date': pd.to_datetime(timestamps, unit='s'),  # Unix timestamp in seconds
+                'Date': pd.to_datetime(timestamps, unit='s', utc=True),  # Unix timestamp in seconds, UTC
                 'Open': option_data.get('open', []),
                 'High': option_data.get('high', []),
                 'Low': option_data.get('low', []),
